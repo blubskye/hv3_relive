@@ -1924,7 +1924,7 @@ nodeRemoveCmd(pNode, objc, objv)
 
     for (ii = 2; ii < objc; ii++) {
         Tcl_Obj **apNode;
-        int nNode;
+        Tcl_Size nNode;
         int jj;
         int rc;
 
@@ -2056,7 +2056,7 @@ nodeInsertCmd(pNode, objc, objv)
 
     for (ii = (pBefore ? 4 : 2); ii < objc; ii++) {
         Tcl_Obj **apNode;
-        int nNode;
+        Tcl_Size nNode;
         int jj;
         int rc;
 

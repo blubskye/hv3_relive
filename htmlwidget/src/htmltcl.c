@@ -71,7 +71,12 @@ heapdebugCmd(clientData, interp, objc, objv)
     int objc;                          /* Number of arguments. */
     Tcl_Obj *CONST objv[];             /* Argument strings. */
 {
+#ifdef HTML_DEBUG
     return HtmlHeapDebug(0, interp, objc, objv);
+#else
+    Tcl_SetResult(interp, "Heap debugging not enabled", TCL_STATIC);
+    return TCL_OK;
+#endif
 }
 static int 
 hashstatsCmd(clientData, interp, objc, objv)
@@ -1402,7 +1407,7 @@ BOOLEAN(forcewidth, "forceWidth", "ForceWidth", "0", L_MASK),
         }
     
         if (init || mask & FT_MASK) {
-            int nSize;
+            Tcl_Size nSize;
             Tcl_Obj **apSize;
             int aFontSize[7];
             Tcl_Obj *pFT = pTree->options.fonttable;
