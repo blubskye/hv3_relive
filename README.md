@@ -155,6 +155,65 @@ make
 
 ---
 
+## 🚀 Running HV3
+
+### 📍 Binary Locations
+
+After building, you'll find the compiled components at:
+
+| Component | Location | Type |
+|-----------|----------|------|
+| **Polipo** | `polipo/polipo` | Binary (727KB) |
+| **Tkhtml3** | `build-tkhtml/libTkhtml3.0.so` | Shared Library (400KB) |
+| **Tkhtml3 Package** | `build-tkhtml/pkgIndex.tcl` | Tcl Package Index |
+| **Tclsee** | `tclsee/tclsee0.1/libTclsee.so` | Shared Library (718KB) |
+| **Tclsee Package** | `tclsee/tclsee0.1/pkgIndex.tcl` | Tcl Package Index |
+
+### ▶️ Launching the Browser
+
+Use the provided launcher script:
+
+```bash
+./run-hv3.sh
+```
+
+The launcher script automatically:
+- Sets up package paths for Tkhtml3 and Tclsee
+- Launches the HV3 browser with proper environment
+
+### 🎯 Manual Launch
+
+If you prefer to run manually:
+
+```bash
+cd htmlwidget/hv
+export TCLLIBPATH="../../build-tkhtml ../../tclsee"
+tclsh hv3_main.tcl
+```
+
+### 📋 Runtime Requirements
+
+- **Tcl/Tk 9.0+** - Required
+- **Tkhtml3 package** - Built in `build-tkhtml/`
+- **Optional packages:**
+  - `Img` - For additional image format support (PNG, JPEG, GIF)
+  - `sqlite3` - For cookies and history
+  - `Tclsee` - For JavaScript support
+
+### ⚡ Optional: Start Polipo Proxy
+
+For improved performance with caching:
+
+```bash
+# In a separate terminal
+cd polipo
+./polipo
+```
+
+Then configure HV3 to use the proxy at `localhost:8123`
+
+---
+
 ## 🔨 Tcl 9.0 Compatibility Fixes
 
 This project includes extensive compatibility fixes for Tcl 9.0:
