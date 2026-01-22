@@ -139,6 +139,11 @@
 #include <tcl.h>
 #include <see/see.h>
 
+/* Compatibility for Tcl 9.0+ where CONST was removed */
+#ifndef CONST
+#define CONST const
+#endif
+
 #ifdef NO_HAVE_GC
     /* If the symbol NO_HAVE_GC is defined, have SEE use regular malloc() 
      * instead of a garbage-collecting version. Of course, it leaks a
@@ -160,6 +165,32 @@
 /* Just plain handy, these guys. */
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
+
+/* Unicode conversion helpers for Tcl 9.0 compatibility
+ * SEE uses 16-bit chars (SEE_char_t = unsigned short)
+ * Tcl 9.0 uses 32-bit chars (Tcl_UniChar = int)
+ */
+static Tcl_UniChar *
+SEE_to_TclUnicode(const SEE_char_t *see_str, int length) {
+    Tcl_UniChar *tcl_str = (Tcl_UniChar *)ckalloc((length + 1) * sizeof(Tcl_UniChar));
+    int i;
+    for (i = 0; i < length; i++) {
+        tcl_str[i] = (Tcl_UniChar)see_str[i];
+    }
+    tcl_str[length] = 0;
+    return tcl_str;
+}
+
+static SEE_char_t *
+TclUnicode_to_SEE(const Tcl_UniChar *tcl_str, int length) {
+    SEE_char_t *see_str = (SEE_char_t *)ckalloc((length + 1) * sizeof(SEE_char_t));
+    int i;
+    for (i = 0; i < length; i++) {
+        see_str[i] = (SEE_char_t)tcl_str[i];
+    }
+    see_str[length] = 0;
+    return see_str;
+}
 
 /* File hv3format.c contains the code to uniformly indent javascript
  * text. This is used to make stuff in the debugger more readable, it
@@ -370,7 +401,7 @@ allocWordArray(p, pSeeTclObject, nExtra)
         (pSeeTclObject->nWord == 0) || 
         ((pSeeTclObject->nAllocWord - pSeeTclObject->nWord) < nExtra)
     ) {
-        int n;
+        Tcl_Size n;
         int nByte;
         int rc;
         Tcl_Obj **apWord;
@@ -494,7 +525,7 @@ createObjectRef(pTclSeeInterp, pObject)
 static void
 removeTransientRefs(pTclSeeInterp, n)
     SeeInterp *pTclSeeInterp;
-    int n;
+    Tcl_Size n;
 {
     int ii;
     for(ii = 0; ii < n; ii++) {
@@ -564,7 +595,9 @@ stringToObj(pString)
 {
     Tcl_Obj *pObj;
     if( pString ){
-        pObj = Tcl_NewUnicodeObj(pString->data, pString->length);
+        Tcl_UniChar *tcl_str = SEE_to_TclUnicode(pString->data, pString->length);
+        pObj = Tcl_NewUnicodeObj(tcl_str, pString->length);
+        ckfree((char *)tcl_str);
     } else {
         pObj = Tcl_NewObj();
     }
@@ -971,7 +1004,7 @@ createNative(pTclSeeInterp, pTclList)
 {
     Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
     struct SEE_interpreter *pSee = (struct SEE_interpreter *)pTclSeeInterp;
-    int nElem = 0;
+    Tcl_Size nElem = 0;
     Tcl_Obj **apElem = 0;
     int rc;
     int ii;
@@ -1207,7 +1240,7 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
     int *pIsCacheable;              /* OUT: Cacheable? */
 {
     int rc;
-    int nElem = 0;
+    Tcl_Size nElem = 0;
     Tcl_Obj **apElem = 0;
 
     Tcl_Interp *pTclInterp = pInterp->pTclInterp;
@@ -1302,17 +1335,20 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
                     break;
                 }
                 case SEE_STRING: {
-                    int nChar;
+                    Tcl_Size nChar;
                     Tcl_UniChar *zChar;
+                    SEE_char_t *see_chars;
                     struct SEE_string *pString;
                     struct SEE_string str;
 
                     zChar = Tcl_GetUnicodeFromObj(apElem[1], &nChar);;
+                    see_chars = TclUnicode_to_SEE(zChar, nChar);
 
                     pString = SEE_string_new(&pInterp->interp, nChar);
                     str.length = nChar;
-                    str.data = zChar;
+                    str.data = see_chars;
                     SEE_string_append(pString, &str);
+                    ckfree((char *)see_chars);
 
                     SEE_SET_STRING(pValue, pString);
                     break;
@@ -1622,11 +1658,16 @@ interpEval(pTclSeeInterp, nArg, apArg)
          * from within a trace callback. In this case use SEE_context_eval()
          */
         struct SEE_string input;
+        Tcl_UniChar *tcl_chars;
+        Tcl_Size tcl_len;
         memset(&input, 0, sizeof(struct SEE_string));
-        input.data = Tcl_GetUnicodeFromObj(pCode, (int *)&input.length);
+        tcl_chars = Tcl_GetUnicodeFromObj(pCode, &tcl_len);
+        input.data = TclUnicode_to_SEE(tcl_chars, tcl_len);
+        input.length = tcl_len;
         SEE_TRY(pSee, try_ctxt) {
             SEE_context_eval(pTclSeeInterp->pTraceContext, &input, &res);
         }
+        ckfree((char *)input.data);
     } else {
         struct SEE_input *pInput = SEE_input_utf8(pSee, Tcl_GetString(pCode));
 
@@ -2470,7 +2511,7 @@ tclEnumerator(pInterp, pObj)
 
     Tcl_Obj *pRet = 0;       /* Return value of script */
     Tcl_Obj **apRet = 0;     /* List elements of pRet */
-    int nRet = 0;            /* size of apString */
+    Tcl_Size nRet = 0;       /* size of apString */
 
     SeeTclEnum *pEnum;
     int ii;
@@ -2599,7 +2640,7 @@ tclSeeClass(clientData, interp, objc, objv)
 {
     SeeTclClass *p;
     Tcl_Obj **apObj;
-    int nObj;
+    Tcl_Size nObj;
 
     int ii;
     char zBuf[256];

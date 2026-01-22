@@ -18,6 +18,11 @@
  *     };
  */
 
+/* Compatibility for Tcl 9.0+ where CONST was removed */
+#ifndef CONST
+#define CONST const
+#endif
+
 /*
  * By defining STOP_PROPAGATION as "cancelBubble", we can also
  * support the mozilla extension Event.cancelBubble. Setting it to true
@@ -773,7 +778,7 @@ eventTargetInit(pTclSeeInterp, p)
     Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
     Tcl_Obj *pList;
     Tcl_Obj **apWord;
-    int nWord;
+    Tcl_Size nWord;
     int ii;
 
     struct SEE_scope *pScope = 0;
@@ -794,7 +799,7 @@ eventTargetInit(pTclSeeInterp, p)
     Tcl_IncrRefCount(pList);
 
     if (nWord > 0) {
-        int nS;
+        Tcl_Size nS;
         Tcl_Obj **apS;
         Tcl_Obj *pScopeList;
 
@@ -960,10 +965,11 @@ eventDumpCmd(clientData, pTcl, objc, objv)
 
     for (pType = p->pTypeList; pType; pType = pType->pNext) {
         ListenerContainer *pL;
+        Tcl_UniChar *tcl_str;
 
-        Tcl_Obj *pEventType = Tcl_NewUnicodeObj(
-                pType->zType->data, pType->zType->length
-        );
+        tcl_str = SEE_to_TclUnicode(pType->zType->data, pType->zType->length);
+        Tcl_Obj *pEventType = Tcl_NewUnicodeObj(tcl_str, pType->zType->length);
+        ckfree((char *)tcl_str);
         Tcl_IncrRefCount(pEventType);
         apRow[0] = pEventType;
 

@@ -15,7 +15,7 @@ MKSHLIB = $(CC) -shared
 TCLSTUBSLIB_MEMDEBUG  =  "/home/dan/memtcl/lib/libtclstub8.5.a" 
 TCLSTUBSLIB_MEMDEBUG += "/home/dan/memtcl/lib/libtkstub8.5.a" 
 
-TCLSTUBSLIB_DEBUG = -L/usr/lib/x86_64-linux-gnu -ltclstub8.6
+TCLSTUBSLIB_DEBUG = -L/usr/lib64 -ltclstub -ltkstub
 
 TCLSTUBSLIB = $(TCLSTUBSLIB_$(BUILD))
 
@@ -39,12 +39,13 @@ JS_SHARED_LIB = libTclsee.so
 #JSLIB  = $(HOME)/javascript/install_nogc/lib/libsee.a
 #JSFLAGS = -I$(HOME)/javascript/install_nogc/include -DNO_HAVE_GC
 
-JSLIB   = /usr/local/lib/libgc.a
+JSLIB   = /usr/lib64/libgc.so
 JSLIB  += /usr/local/lib/libsee.a -lpthread
 
+JSFLAGS = -I/usr/local/include
 
-CLFAGS  = -I/usr/local/include
-CFLAGS += -I/usr/include/tcl8.6
+CFLAGS  = -I/usr/local/include
+CFLAGS += -I/usr/include
 CFLAGS += -fPIC -shared
 
 #CFLAGS += -I$(TCL)/include -I. -I$(TOP)/src/
