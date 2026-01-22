@@ -734,9 +734,9 @@ getWidgetTag(pTree, zTag, pIsNew)
         Tk_OptionTable otab = pTree->tagOptionTable;
         static Tk_OptionSpec ospec[] = {
             {TK_OPTION_COLOR, "-foreground", "", "", "white", -1, \
-             Tk_Offset(HtmlWidgetTag, foreground), 0, 0, 0},
+             offsetof(HtmlWidgetTag, foreground), 0, 0, 0},
             {TK_OPTION_COLOR, "-background", "", "", "black", -1, \
-             Tk_Offset(HtmlWidgetTag, background), 0, 0, 0},
+             offsetof(HtmlWidgetTag, background), 0, 0, 0},
 
             {TK_OPTION_SYNONYM, "-bg", 0, 0, 0, 0, -1, 0, "-background", 0},
             {TK_OPTION_SYNONYM, "-fg", 0, 0, 0, 0, -1, 0, "-foreground", 0},
