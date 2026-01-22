@@ -1,0 +1,25 @@
+# Build outputs
+*.o
+*.so
+*.a
+build-tkhtml/*.o
+build-tkhtml/*.so
+build-tkhtml/pkgIndex.tcl
+build-tkhtml/tkhtml.n
+build-tkhtml/cssparse.c
+build-tkhtml/cssparse.h
+build-tkhtml/cssparse.out
+build-tkhtml/cssprop.c
+build-tkhtml/cssprop.h
+build-tkhtml/lempar.c
+build-tkhtml/lemon
+
+# Editor and IDE files
+*~
+.*.swp
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
