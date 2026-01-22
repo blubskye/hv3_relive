@@ -39,6 +39,7 @@ static char const rcsid[] = "@(#) $Id: htmltcl.c,v 1.191 2007/10/03 10:06:38 dan
 #include <fcntl.h>
 #include <errno.h>
 #include <assert.h>
+#include <stdarg.h>
 #include "html.h"
 #include "swproc.h"
 
@@ -1652,7 +1653,7 @@ parseCmd(clientData, interp, objc, objv)
 
     int isFinal;
     char *zHtml;
-    int nHtml;
+    Tcl_Size nHtml;
     int eWriteState;
 
     Tcl_Obj *aObj[2];
@@ -2163,7 +2164,7 @@ styleCmd(clientData, interp, objc, objv)
     };
     Tcl_Obj *apObj[4];
     int rc = TCL_OK;
-    int n;
+    Tcl_Size n;
     HtmlTree *pTree = (HtmlTree *)clientData;
 
     /* First assert() that the sizes of the aConf and apObj array match. Then

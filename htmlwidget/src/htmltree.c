@@ -2182,7 +2182,7 @@ nodeTextCommand(interp, pNode, objc, objv)
          */
         const char *zCommand;
         const char *zNew;
-        int nNew;
+        Tcl_Size nNew;
         HtmlTextNode *pNew;
         HtmlTextNode *pOrig;
         Tcl_CmdInfo info;
