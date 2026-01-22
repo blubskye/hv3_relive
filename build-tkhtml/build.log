@@ -1,0 +1,1504 @@
+gcc -pipe -DPACKAGE_NAME=\"Tkhtml\" -DPACKAGE_TARNAME=\"tkhtml\" -DPACKAGE_VERSION=\"3.0\" -DPACKAGE_STRING=\"Tkhtml\ 3.0\" -DPACKAGE_BUGREPORT=\"\" -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_SYS_PARAM_H=1 -DUSE_THREAD_ALLOC=1 -D_REENTRANT=1 -D_THREAD_SAFE=1 -DTCL_THREADS=1 -D_LARGEFILE64_SOURCE=1 -DTCL_WIDE_INT_IS_LONG=1 -DUSE_TCL_STUBS=1 -DUSE_TK_STUBS=1   -I"/usr/include" -I"/usr/include"     -O2 -fomit-frame-pointer -Wall -Wno-implicit-int -fPIC `echo ../htmlwidget/tools/lemon.c` -o lemon
+../htmlwidget/tools/lemon.c:31:14: error: conflicting types for ‘malloc’; have ‘void *(void)’
+   31 | extern void *malloc();
+      |              ^~~~~~
+In file included from ../htmlwidget/tools/lemon.c:13:
+/usr/include/stdlib.h:672:14: note: previous declaration of ‘malloc’ with type ‘void *(long unsigned int)’
+  672 | extern void *malloc (size_t __size) __THROW __attribute_malloc__
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Action_new’:
+../htmlwidget/tools/lemon.c:341:33: error: too many arguments to function ‘malloc’; expected 0, have 1
+  341 |     freelist = (struct action *)malloc( sizeof(struct action)*amt );
+      |                                 ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘actioncmp’:
+../htmlwidget/tools/lemon.c:355:12: warning: old-style function definition [-Wold-style-definition]
+  355 | static int actioncmp(ap1,ap2)
+      |            ^~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:363:5: note: in expansion of macro ‘assert’
+  363 |     assert( ap1->type==REDUCE || ap1->type==RD_RESOLVED || ap1->type==CONFLICT);
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:38:6: note: declared here
+   38 | void myassert();
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:364:5: note: in expansion of macro ‘assert’
+  364 |     assert( ap2->type==REDUCE || ap2->type==RD_RESOLVED || ap2->type==CONFLICT);
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:38:6: note: declared here
+   38 | void myassert();
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Action_sort’:
+../htmlwidget/tools/lemon.c:371:16: warning: old-style function definition [-Wold-style-definition]
+  371 | struct action *Action_sort(ap)
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:373:1: error: number of arguments doesn’t match prototype
+  373 | {
+      | ^
+../htmlwidget/tools/lemon.c:35:16: error: prototype declaration
+   35 | struct action *Action_sort();
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:374:25: error: too many arguments to function ‘msort’; expected 0, have 3
+  374 |   ap = (struct action *)msort((char *)ap,(char **)&ap->next,actioncmp);
+      |                         ^~~~~ ~~~~~~~~~~
+../htmlwidget/tools/lemon.c:30:7: note: declared here
+   30 | char *msort();
+      |       ^~~~~
+../htmlwidget/tools/lemon.c: In function ‘Action_add’:
+../htmlwidget/tools/lemon.c:378:6: warning: old-style function definition [-Wold-style-definition]
+  378 | void Action_add(app,type,sp,arg)
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘acttab_alloc’:
+../htmlwidget/tools/lemon.c:439:15: error: too many arguments to function ‘malloc’; expected 0, have 1
+  439 |   acttab *p = malloc( sizeof(*p) );
+      |               ^~~~~~  ~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘acttab_insert’:
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:485:3: note: in expansion of macro ‘assert’
+  485 |   assert( p->nLookahead>0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:38:6: note: declared here
+   38 | void myassert();
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘myassert’:
+../htmlwidget/tools/lemon.c:564:6: warning: old-style function definition [-Wold-style-definition]
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:567:1: error: number of arguments doesn’t match prototype
+  567 | {
+      | ^
+../htmlwidget/tools/lemon.c:38:6: error: prototype declaration
+   38 | void myassert();
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindRulePrecedences’:
+../htmlwidget/tools/lemon.c:586:6: warning: old-style function definition [-Wold-style-definition]
+  586 | void FindRulePrecedences(xp)
+      |      ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:588:1: error: number of arguments doesn’t match prototype
+  588 | {
+      | ^
+../htmlwidget/tools/lemon.c:46:6: error: prototype declaration
+   46 | void FindRulePrecedences();
+      |      ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindFirstSets’:
+../htmlwidget/tools/lemon.c:616:6: warning: old-style function definition [-Wold-style-definition]
+  616 | void FindFirstSets(lemp)
+      |      ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:618:1: error: number of arguments doesn’t match prototype
+  618 | {
+      | ^
+../htmlwidget/tools/lemon.c:47:6: error: prototype declaration
+   47 | void FindFirstSets();
+      |      ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:655:23: error: too many arguments to function ‘SetAdd’; expected 0, have 2
+  655 |           progress += SetAdd(s1->firstset,s2->index);
+      |                       ^~~~~~ ~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:104:5: note: declared here
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:659:25: error: too many arguments to function ‘SetAdd’; expected 0, have 2
+  659 |             progress += SetAdd(s1->firstset,s2->subsym[j]->index);
+      |                         ^~~~~~ ~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:104:5: note: declared here
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:665:23: error: too many arguments to function ‘SetUnion’; expected 0, have 2
+  665 |           progress += SetUnion(s1->firstset,s2->firstset);
+      |                       ^~~~~~~~ ~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:105:5: note: declared here
+  105 | int SetUnion(/* char *A,char *B */);    /* A <- A U B, thru element N */
+      |     ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindStates’:
+../htmlwidget/tools/lemon.c:679:6: warning: old-style function definition [-Wold-style-definition]
+  679 | void FindStates(lemp)
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:681:1: error: number of arguments doesn’t match prototype
+  681 | {
+      | ^
+../htmlwidget/tools/lemon.c:48:6: error: prototype declaration
+   48 | void FindStates();
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:689:10: error: too many arguments to function ‘Symbol_find’; expected 0, have 1
+  689 |     sp = Symbol_find(lemp->start);
+      |          ^~~~~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:308:16: note: declared here
+  308 | struct symbol *Symbol_find(/* char * */);
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:723:14: error: too many arguments to function ‘Configlist_addbasis’; expected 0, have 2
+  723 |     newcfp = Configlist_addbasis(rp,0);
+      |              ^~~~~~~~~~~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c:56:16: note: declared here
+   56 | struct config *Configlist_addbasis(/* struct rule *, int */);
+      |                ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:724:5: error: too many arguments to function ‘SetAdd’; expected 0, have 2
+  724 |     SetAdd(newcfp->fws,0);
+      |     ^~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:104:5: note: declared here
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:730:9: error: too many arguments to function ‘getstate’; expected 0, have 1
+  730 |   (void)getstate(lemp);
+      |         ^~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:678:23: note: declared here
+  678 | PRIVATE struct state *getstate(/* struct lemon * */);  /* forward reference */
+      |                       ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘getstate’:
+../htmlwidget/tools/lemon.c:738:23: warning: old-style function definition [-Wold-style-definition]
+  738 | PRIVATE struct state *getstate(lemp)
+      |                       ^~~~~~~~
+../htmlwidget/tools/lemon.c:740:1: error: number of arguments doesn’t match prototype
+  740 | {
+      | ^
+../htmlwidget/tools/lemon.c:678:23: error: prototype declaration
+  678 | PRIVATE struct state *getstate(/* struct lemon * */);  /* forward reference */
+      |                       ^~~~~~~~
+../htmlwidget/tools/lemon.c:750:9: error: too many arguments to function ‘State_find’; expected 0, have 1
+  750 |   stp = State_find(bp);
+      |         ^~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c:319:15: note: declared here
+  319 | struct state *State_find(/* struct config * */);
+      |               ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:757:7: error: too many arguments to function ‘Plink_copy’; expected 0, have 2
+  757 |       Plink_copy(&y->bplp,x->bplp);
+      |       ^~~~~~~~~~ ~~~~~~~~
+../htmlwidget/tools/lemon.c:88:6: note: declared here
+   88 | void Plink_copy(/* struct plink **, struct plink * */);
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:758:7: error: too many arguments to function ‘Plink_delete’; expected 0, have 1
+  758 |       Plink_delete(x->fplp);
+      |       ^~~~~~~~~~~~ ~~~~~~~
+../htmlwidget/tools/lemon.c:89:6: note: declared here
+   89 | void Plink_delete(/* struct plink * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:762:5: error: too many arguments to function ‘Configlist_eat’; expected 0, have 1
+  762 |     Configlist_eat(cfp);
+      |     ^~~~~~~~~~~~~~ ~~~
+../htmlwidget/tools/lemon.c:62:6: note: declared here
+   62 | void Configlist_eat(/* struct config * */);
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:765:5: error: too many arguments to function ‘Configlist_closure’; expected 0, have 1
+  765 |     Configlist_closure(lemp);    /* Compute the configuration closure */
+      |     ^~~~~~~~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:57:6: note: declared here
+   57 | void Configlist_closure(/* void */);
+      |      ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:774:5: error: too many arguments to function ‘State_insert’; expected 0, have 2
+  774 |     State_insert(stp,stp->bp);   /* Add to the state table */
+      |     ^~~~~~~~~~~~ ~~~
+../htmlwidget/tools/lemon.c:318:5: note: declared here
+  318 | int State_insert(/* struct state *, struct config * */);
+      |     ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:775:5: error: too many arguments to function ‘buildshifts’; expected 0, have 2
+  775 |     buildshifts(lemp,stp);       /* Recursively compute successor states */
+      |     ^~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:737:14: note: declared here
+  737 | PRIVATE void buildshifts(/* struct lemon *, struct state * */); /* Forwd ref */
+      |              ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘same_symbol’:
+../htmlwidget/tools/lemon.c:783:5: warning: old-style function definition [-Wold-style-definition]
+  783 | int same_symbol(a,b)
+      |     ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘buildshifts’:
+../htmlwidget/tools/lemon.c:801:14: warning: old-style function definition [-Wold-style-definition]
+  801 | PRIVATE void buildshifts(lemp,stp)
+      |              ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:804:1: error: number of arguments doesn’t match prototype
+  804 | {
+      | ^
+../htmlwidget/tools/lemon.c:737:14: error: prototype declaration
+  737 | PRIVATE void buildshifts(/* struct lemon *, struct state * */); /* Forwd ref */
+      |              ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:832:13: error: too many arguments to function ‘Configlist_addbasis’; expected 0, have 2
+  832 |       new = Configlist_addbasis(bcfp->rp,bcfp->dot+1);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~
+../htmlwidget/tools/lemon.c:56:16: note: declared here
+   56 | struct config *Configlist_addbasis(/* struct rule *, int */);
+      |                ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:833:7: error: too many arguments to function ‘Plink_add’; expected 0, have 2
+  833 |       Plink_add(&new->bplp,bcfp);
+      |       ^~~~~~~~~ ~~~~~~~~~~
+../htmlwidget/tools/lemon.c:87:6: note: declared here
+   87 | void Plink_add(/* struct plink **, struct config * */);
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c:838:14: error: too many arguments to function ‘getstate’; expected 0, have 1
+  838 |     newstp = getstate(lemp);
+      |              ^~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:738:23: note: declared here
+  738 | PRIVATE struct state *getstate(lemp)
+      |                       ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindLinks’:
+../htmlwidget/tools/lemon.c:856:6: warning: old-style function definition [-Wold-style-definition]
+  856 | void FindLinks(lemp)
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c:858:1: error: number of arguments doesn’t match prototype
+  858 | {
+      | ^
+../htmlwidget/tools/lemon.c:49:6: error: prototype declaration
+   49 | void FindLinks();
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c:881:9: error: too many arguments to function ‘Plink_add’; expected 0, have 2
+  881 |         Plink_add(&other->fplp,cfp);
+      |         ^~~~~~~~~ ~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:87:6: note: declared here
+   87 | void Plink_add(/* struct plink **, struct config * */);
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindFollowSets’:
+../htmlwidget/tools/lemon.c:892:6: warning: old-style function definition [-Wold-style-definition]
+  892 | void FindFollowSets(lemp)
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:894:1: error: number of arguments doesn’t match prototype
+  894 | {
+      | ^
+../htmlwidget/tools/lemon.c:50:6: error: prototype declaration
+   50 | void FindFollowSets();
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:913:20: error: too many arguments to function ‘SetUnion’; expected 0, have 2
+  913 |           change = SetUnion(plp->cfp->fws,cfp->fws);
+      |                    ^~~~~~~~ ~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:105:5: note: declared here
+  105 | int SetUnion(/* char *A,char *B */);    /* A <- A U B, thru element N */
+      |     ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘FindActions’:
+../htmlwidget/tools/lemon.c:929:6: warning: old-style function definition [-Wold-style-definition]
+  929 | void FindActions(lemp)
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:931:1: error: number of arguments doesn’t match prototype
+  931 | {
+      | ^
+../htmlwidget/tools/lemon.c:51:6: error: prototype declaration
+   51 | void FindActions();
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:959:10: error: too many arguments to function ‘Symbol_find’; expected 0, have 1
+  959 |     sp = Symbol_find(lemp->start);
+      |          ^~~~~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:308:16: note: declared here
+  308 | struct symbol *Symbol_find(/* char * */);
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:974:5: note: in expansion of macro ‘assert’
+  974 |     assert( stp->ap );
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:975:15: error: too many arguments to function ‘Action_sort’; expected 0, have 1
+  975 |     stp->ap = Action_sort(stp->ap);
+      |               ^~~~~~~~~~~ ~~~~~~~
+../htmlwidget/tools/lemon.c:371:16: note: declared here
+  371 | struct action *Action_sort(ap)
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:980:29: error: too many arguments to function ‘resolve_conflict’; expected 0, have 3
+  980 |          lemp->nconflict += resolve_conflict(ap,nap,lemp->errsym);
+      |                             ^~~~~~~~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c:925:12: note: declared here
+  925 | static int resolve_conflict();
+      |            ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘resolve_conflict’:
+../htmlwidget/tools/lemon.c:1013:12: warning: old-style function definition [-Wold-style-definition]
+ 1013 | static int resolve_conflict(apx,apy,errsym)
+      |            ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1020:3: note: in expansion of macro ‘assert’
+ 1020 |   assert( apx->sp==apy->sp );  /* Otherwise there would be no conflict */
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1037:7: note: in expansion of macro ‘assert’
+ 1037 |       assert( spx->prec==spy->prec && spx->assoc==NONE );
+      |       ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1054:5: note: in expansion of macro ‘assert’
+ 1054 |     assert(
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘newconfig’:
+../htmlwidget/tools/lemon.c:1086:33: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 1086 |     freelist = (struct config *)malloc( sizeof(struct config)*amt );
+      |                                 ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘deleteconfig’:
+../htmlwidget/tools/lemon.c:1100:14: warning: old-style function definition [-Wold-style-definition]
+ 1100 | PRIVATE void deleteconfig(old)
+      |              ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_reset’:
+../htmlwidget/tools/lemon.c:1123:3: error: too many arguments to function ‘Configtable_clear’; expected 0, have 1
+ 1123 |   Configtable_clear(0);
+      |   ^~~~~~~~~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:327:6: note: declared here
+  327 | void Configtable_clear(/* int(*)(struct config *) */);
+      |      ^~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_add’:
+../htmlwidget/tools/lemon.c:1128:16: warning: old-style function definition [-Wold-style-definition]
+ 1128 | struct config *Configlist_add(rp,dot)
+      |                ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1131:1: error: number of arguments doesn’t match prototype
+ 1131 | {
+      | ^
+../htmlwidget/tools/lemon.c:55:16: error: prototype declaration
+   55 | struct config *Configlist_add(/* struct rule *, int */);
+      |                ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1134:3: note: in expansion of macro ‘assert’
+ 1134 |   assert( currentend!=0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:1137:9: error: too many arguments to function ‘Configtable_find’; expected 0, have 1
+ 1137 |   cfp = Configtable_find(&model);
+      |         ^~~~~~~~~~~~~~~~ ~~~~~~
+../htmlwidget/tools/lemon.c:326:16: note: declared here
+  326 | struct config *Configtable_find(/* struct config * */);
+      |                ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1149:5: error: too many arguments to function ‘Configtable_insert’; expected 0, have 1
+ 1149 |     Configtable_insert(cfp);
+      |     ^~~~~~~~~~~~~~~~~~ ~~~
+../htmlwidget/tools/lemon.c:325:5: note: declared here
+  325 | int Configtable_insert(/* struct config * */);
+      |     ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_addbasis’:
+../htmlwidget/tools/lemon.c:1155:16: warning: old-style function definition [-Wold-style-definition]
+ 1155 | struct config *Configlist_addbasis(rp,dot)
+      |                ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1158:1: error: number of arguments doesn’t match prototype
+ 1158 | {
+      | ^
+../htmlwidget/tools/lemon.c:56:16: error: prototype declaration
+   56 | struct config *Configlist_addbasis(/* struct rule *, int */);
+      |                ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1161:3: note: in expansion of macro ‘assert’
+ 1161 |   assert( basisend!=0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1162:3: note: in expansion of macro ‘assert’
+ 1162 |   assert( currentend!=0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:1165:9: error: too many arguments to function ‘Configtable_find’; expected 0, have 1
+ 1165 |   cfp = Configtable_find(&model);
+      |         ^~~~~~~~~~~~~~~~ ~~~~~~
+../htmlwidget/tools/lemon.c:326:16: note: declared here
+  326 | struct config *Configtable_find(/* struct config * */);
+      |                ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1179:5: error: too many arguments to function ‘Configtable_insert’; expected 0, have 1
+ 1179 |     Configtable_insert(cfp);
+      |     ^~~~~~~~~~~~~~~~~~ ~~~
+../htmlwidget/tools/lemon.c:325:5: note: declared here
+  325 | int Configtable_insert(/* struct config * */);
+      |     ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_closure’:
+../htmlwidget/tools/lemon.c:1185:6: warning: old-style function definition [-Wold-style-definition]
+ 1185 | void Configlist_closure(lemp)
+      |      ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1187:1: error: number of arguments doesn’t match prototype
+ 1187 | {
+      | ^
+../htmlwidget/tools/lemon.c:57:6: error: prototype declaration
+   57 | void Configlist_closure(/* void */);
+      |      ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1193:3: note: in expansion of macro ‘assert’
+ 1193 |   assert( currentend!=0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:1206:18: error: too many arguments to function ‘Configlist_add’; expected 0, have 2
+ 1206 |         newcfp = Configlist_add(newrp,0);
+      |                  ^~~~~~~~~~~~~~ ~~~~~
+../htmlwidget/tools/lemon.c:1128:16: note: declared here
+ 1128 | struct config *Configlist_add(rp,dot)
+      |                ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1210:13: error: too many arguments to function ‘SetAdd’; expected 0, have 2
+ 1210 |             SetAdd(newcfp->fws,xsp->index);
+      |             ^~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:104:5: note: declared here
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:1215:15: error: too many arguments to function ‘SetAdd’; expected 0, have 2
+ 1215 |               SetAdd(newcfp->fws, xsp->subsym[k]->index);
+      |               ^~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:104:5: note: declared here
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:1219:13: error: too many arguments to function ‘SetUnion’; expected 0, have 2
+ 1219 |             SetUnion(newcfp->fws,xsp->firstset);
+      |             ^~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:105:5: note: declared here
+  105 | int SetUnion(/* char *A,char *B */);    /* A <- A U B, thru element N */
+      |     ^~~~~~~~
+../htmlwidget/tools/lemon.c:1223:27: error: too many arguments to function ‘Plink_add’; expected 0, have 2
+ 1223 |         if( i==rp->nrhs ) Plink_add(&cfp->fplp,newcfp);
+      |                           ^~~~~~~~~ ~~~~~~~~~~
+../htmlwidget/tools/lemon.c:87:6: note: declared here
+   87 | void Plink_add(/* struct plink **, struct config * */);
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_sort’:
+../htmlwidget/tools/lemon.c:1232:30: error: too many arguments to function ‘msort’; expected 0, have 3
+ 1232 |   current = (struct config *)msort((char *)current,(char **)&(current->next),Configcmp);
+      |                              ^~~~~ ~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:30:7: note: declared here
+   30 | char *msort();
+      |       ^~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_sortbasis’:
+../htmlwidget/tools/lemon.c:1239:28: error: too many arguments to function ‘msort’; expected 0, have 3
+ 1239 |   basis = (struct config *)msort((char *)current,(char **)&(current->bp),Configcmp);
+      |                            ^~~~~ ~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:30:7: note: declared here
+   30 | char *msort();
+      |       ^~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configlist_eat’:
+../htmlwidget/tools/lemon.c:1265:6: warning: old-style function definition [-Wold-style-definition]
+ 1265 | void Configlist_eat(cfp)
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1267:1: error: number of arguments doesn’t match prototype
+ 1267 | {
+      | ^
+../htmlwidget/tools/lemon.c:62:6: error: prototype declaration
+   62 | void Configlist_eat(/* struct config * */);
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1271:5: note: in expansion of macro ‘assert’
+ 1271 |     assert( cfp->fplp==0 );
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1272:5: note: in expansion of macro ‘assert’
+ 1272 |     assert( cfp->bplp==0 );
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:1273:20: error: too many arguments to function ‘SetFree’; expected 0, have 1
+ 1273 |     if( cfp->fws ) SetFree(cfp->fws);
+      |                    ^~~~~~~ ~~~~~~~~
+../htmlwidget/tools/lemon.c:102:7: note: declared here
+  102 | void  SetFree(/* char* */);             /* Deallocate a set */
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘findbreak’:
+../htmlwidget/tools/lemon.c:1286:12: warning: old-style function definition [-Wold-style-definition]
+ 1286 | static int findbreak(msg,min,max)
+      |            ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘handle_D_option’:
+../htmlwidget/tools/lemon.c:1378:10: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 1378 |   *paz = malloc( strlen(z)+1 );
+      |          ^~~~~~  ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘main’:
+../htmlwidget/tools/lemon.c:1390:5: warning: old-style function definition [-Wold-style-definition]
+ 1390 | int main(argc,argv)
+      |     ^~~~
+../htmlwidget/tools/lemon.c:1416:3: error: too many arguments to function ‘OptInit’; expected 0, have 3
+ 1416 |   OptInit(argv,options,stderr);
+      |   ^~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:76:8: note: declared here
+   76 | int    OptInit(/* char**,struct s_options*,FILE* */);
+      |        ^~~~~~~
+../htmlwidget/tools/lemon.c:1432:18: error: too many arguments to function ‘OptArg’; expected 0, have 1
+ 1432 |   lem.filename = OptArg(0);
+      |                  ^~~~~~ ~
+../htmlwidget/tools/lemon.c:78:8: note: declared here
+   78 | char  *OptArg(/* int */);
+      |        ^~~~~~
+../htmlwidget/tools/lemon.c:1443:3: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 1443 |   Symbol_new("$");
+      |   ^~~~~~~~~~ ~~~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:1444:16: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 1444 |   lem.errsym = Symbol_new("error");
+      |                ^~~~~~~~~~ ~~~~~~~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:1447:3: error: too many arguments to function ‘Parse’; expected 0, have 1
+ 1447 |   Parse(&lem);
+      |   ^~~~~ ~~~~
+../htmlwidget/tools/lemon.c:83:6: note: declared here
+   83 | void Parse(/* struct lemon *lemp */);
+      |      ^~~~~
+../htmlwidget/tools/lemon.c:1456:3: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 1456 |   Symbol_new("{default}");
+      |   ^~~~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:1460:9: error: passing argument 4 of ‘qsort’ from incompatible pointer type [-Wincompatible-pointer-types]
+ 1460 |         (int(*)())Symbolcmpp);
+      |         ^~~~~~~~~~~~~~~~~~~~
+      |         |
+      |         int (*)(void)
+/usr/include/stdlib.h:971:34: note: expected ‘__compar_fn_t’ {aka ‘int (*)(const void *, const void *)’} but argument is of type ‘int (*)(void)’
+  971 |                    __compar_fn_t __compar) __nonnull ((1, 4));
+      |                    ~~~~~~~~~~~~~~^~~~~~~~
+../htmlwidget/tools/lemon.c:305:5: note: ‘Symbolcmpp’ declared here
+  305 | int Symbolcmpp(/* struct symbol **, struct symbol ** */);
+      |     ^~~~~~~~~~
+/usr/include/stdlib.h:948:15: note: ‘__compar_fn_t’ declared here
+  948 | typedef int (*__compar_fn_t) (const void *, const void *);
+      |               ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1467:5: error: too many arguments to function ‘Reprint’; expected 0, have 1
+ 1467 |     Reprint(&lem);
+      |     ^~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:92:6: note: declared here
+   92 | void Reprint(/* struct lemon * */);
+      |      ^~~~~~~
+../htmlwidget/tools/lemon.c:1470:5: error: too many arguments to function ‘SetSize’; expected 0, have 1
+ 1470 |     SetSize(lem.nterminal);
+      |     ^~~~~~~ ~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:100:7: note: declared here
+  100 | void  SetSize(/* int N */);             /* All sets will be of size N */
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c:1473:5: error: too many arguments to function ‘FindRulePrecedences’; expected 0, have 1
+ 1473 |     FindRulePrecedences(&lem);
+      |     ^~~~~~~~~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:586:6: note: declared here
+  586 | void FindRulePrecedences(xp)
+      |      ^~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1477:5: error: too many arguments to function ‘FindFirstSets’; expected 0, have 1
+ 1477 |     FindFirstSets(&lem);
+      |     ^~~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:616:6: note: declared here
+  616 | void FindFirstSets(lemp)
+      |      ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1482:5: error: too many arguments to function ‘FindStates’; expected 0, have 1
+ 1482 |     FindStates(&lem);
+      |     ^~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:679:6: note: declared here
+  679 | void FindStates(lemp)
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:1486:5: error: too many arguments to function ‘FindLinks’; expected 0, have 1
+ 1486 |     FindLinks(&lem);
+      |     ^~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:856:6: note: declared here
+  856 | void FindLinks(lemp)
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c:1489:5: error: too many arguments to function ‘FindFollowSets’; expected 0, have 1
+ 1489 |     FindFollowSets(&lem);
+      |     ^~~~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:892:6: note: declared here
+  892 | void FindFollowSets(lemp)
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1492:5: error: too many arguments to function ‘FindActions’; expected 0, have 1
+ 1492 |     FindActions(&lem);
+      |     ^~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:929:6: note: declared here
+  929 | void FindActions(lemp)
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1495:23: error: too many arguments to function ‘CompressTables’; expected 0, have 1
+ 1495 |     if( compress==0 ) CompressTables(&lem);
+      |                       ^~~~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:96:6: note: declared here
+   96 | void CompressTables(/* struct lemon * */);
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1499:5: error: too many arguments to function ‘ResortStates’; expected 0, have 1
+ 1499 |     ResortStates(&lem);
+      |     ^~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:97:6: note: declared here
+   97 | void ResortStates(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1502:18: error: too many arguments to function ‘ReportOutput’; expected 0, have 1
+ 1502 |     if( !quiet ) ReportOutput(&lem);
+      |                  ^~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:93:6: note: declared here
+   93 | void ReportOutput(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1505:5: error: too many arguments to function ‘ReportTable’; expected 0, have 2
+ 1505 |     ReportTable(&lem, mhflag);
+      |     ^~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:94:6: note: declared here
+   94 | void ReportTable(/* struct lemon * */);
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1510:19: error: too many arguments to function ‘ReportHeader’; expected 0, have 1
+ 1510 |     if( !mhflag ) ReportHeader(&lem);
+      |                   ^~~~~~~~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:95:6: note: declared here
+   95 | void ReportHeader(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘merge’:
+../htmlwidget/tools/lemon.c:1568:14: warning: old-style function definition [-Wold-style-definition]
+ 1568 | static char *merge(a,b,cmp,offset)
+      |              ^~~~~
+../htmlwidget/tools/lemon.c:1581:10: error: too many arguments to function ‘cmp’; expected 0, have 2
+ 1581 |     if( (*cmp)(a,b)<0 ){
+      |         ~^~~~~ ~
+../htmlwidget/tools/lemon.c:1590:12: error: too many arguments to function ‘cmp’; expected 0, have 2
+ 1590 |       if( (*cmp)(a,b)<0 ){
+      |           ~^~~~~ ~
+../htmlwidget/tools/lemon.c: In function ‘msort’:
+../htmlwidget/tools/lemon.c:1620:7: warning: old-style function definition [-Wold-style-definition]
+ 1620 | char *msort(list,next,cmp)
+      |       ^~~~~
+../htmlwidget/tools/lemon.c:1624:1: error: number of arguments doesn’t match prototype
+ 1624 | {
+      | ^
+../htmlwidget/tools/lemon.c:30:7: error: prototype declaration
+   30 | char *msort();
+      |       ^~~~~
+../htmlwidget/tools/lemon.c: In function ‘errline’:
+../htmlwidget/tools/lemon.c:1656:13: warning: old-style function definition [-Wold-style-definition]
+ 1656 | static void errline(n,k,err)
+      |             ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘argindex’:
+../htmlwidget/tools/lemon.c:1681:12: warning: old-style function definition [-Wold-style-definition]
+ 1681 | static int argindex(n)
+      |            ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘handleflags’:
+../htmlwidget/tools/lemon.c:1703:12: warning: old-style function definition [-Wold-style-definition]
+ 1703 | static int handleflags(i,err)
+      |            ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1723:6: error: too many arguments to function ‘(void (*)(void))(op + (sizetype)((long unsigned int)j * 32))->arg’; expected 0, have 1
+ 1723 |     (*(void(*)())(op[j].arg))(v);
+      |     ~^~~~~~~~~~~~~~~~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:1725:6: error: too many arguments to function ‘(void (*)(void))(op + (sizetype)((long unsigned int)j * 32))->arg’; expected 0, have 1
+ 1725 |     (*(void(*)())(op[j].arg))(&argv[i][2]);
+      |     ~^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘handleswitch’:
+../htmlwidget/tools/lemon.c:1739:12: warning: old-style function definition [-Wold-style-definition]
+ 1739 | static int handleswitch(i,err)
+      |            ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:1750:3: note: in expansion of macro ‘assert’
+ 1750 |   assert( cp!=0 );
+      |   ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:1808:10: error: too many arguments to function ‘(void (*)(void))(op + (sizetype)((long unsigned int)j * 32))->arg’; expected 0, have 1
+ 1808 |         (*(void(*)())(op[j].arg))(dv);
+      |         ~^~~~~~~~~~~~~~~~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c:1814:10: error: too many arguments to function ‘(void (*)(void))(op + (sizetype)((long unsigned int)j * 32))->arg’; expected 0, have 1
+ 1814 |         (*(void(*)())(op[j].arg))((int)lv);
+      |         ~^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~
+../htmlwidget/tools/lemon.c:1820:10: error: too many arguments to function ‘(void (*)(void))(op + (sizetype)((long unsigned int)j * 32))->arg’; expected 0, have 1
+ 1820 |         (*(void(*)())(op[j].arg))(sv);
+      |         ~^~~~~~~~~~~~~~~~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c: In function ‘OptInit’:
+../htmlwidget/tools/lemon.c:1827:5: warning: old-style function definition [-Wold-style-definition]
+ 1827 | int OptInit(a,o,err)
+      |     ^~~~~~~
+../htmlwidget/tools/lemon.c:1831:1: error: number of arguments doesn’t match prototype
+ 1831 | {
+      | ^
+../htmlwidget/tools/lemon.c:76:8: error: prototype declaration
+   76 | int    OptInit(/* char**,struct s_options*,FILE* */);
+      |        ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘OptArg’:
+../htmlwidget/tools/lemon.c:1867:7: warning: old-style function definition [-Wold-style-definition]
+ 1867 | char *OptArg(n)
+      |       ^~~~~~
+../htmlwidget/tools/lemon.c:1869:1: error: number of arguments doesn’t match prototype
+ 1869 | {
+      | ^
+../htmlwidget/tools/lemon.c:78:8: error: prototype declaration
+   78 | char  *OptArg(/* int */);
+      |        ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘OptErr’:
+../htmlwidget/tools/lemon.c:1875:6: warning: old-style function definition [-Wold-style-definition]
+ 1875 | void OptErr(n)
+      |      ^~~~~~
+../htmlwidget/tools/lemon.c:1877:1: error: number of arguments doesn’t match prototype
+ 1877 | {
+      | ^
+../htmlwidget/tools/lemon.c:79:8: error: prototype declaration
+   79 | void   OptErr(/* int */);
+      |        ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘parseonetoken’:
+../htmlwidget/tools/lemon.c:1982:13: warning: old-style function definition [-Wold-style-definition]
+ 1982 | static void parseonetoken(psp)
+      |             ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:1986:7: error: too many arguments to function ‘Strsafe’; expected 0, have 1
+ 1986 |   x = Strsafe(psp->tokenstart);     /* Save the token permanently */
+      |       ^~~~~~~ ~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:296:7: note: declared here
+  296 | char *Strsafe();
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c:2002:20: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2002 |         psp->lhs = Symbol_new(x);
+      |                    ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2045:34: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2045 |         psp->prevrule->precsym = Symbol_new(x);
+      |                                  ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2106:29: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2106 |         rp = (struct rule *)malloc( sizeof(struct rule) +
+      |                             ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~
+ 2107 |              sizeof(struct symbol*)*psp->nrhs + sizeof(char*)*psp->nrhs );
+      |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2148:33: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2148 |           psp->rhs[psp->nrhs] = Symbol_new(x);
+      |                                 ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2156:17: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2156 |           msp = malloc(sizeof(*msp));
+      |                 ^~~~~~ ~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2160:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2160 |           msp->subsym = malloc(sizeof(struct symbol*));
+      |                         ^~~~~~ ~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2167:39: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2167 |         msp->subsym[msp->nsubsym-1] = Symbol_new(&x[1]);
+      |                                       ^~~~~~~~~~ ~~~~~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2287:29: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2287 |         struct symbol *sp = Symbol_new(x);
+      |                             ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2300:29: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2300 |         struct symbol *sp = Symbol_new(x);
+      |                             ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2311:14: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2311 |         sp = Symbol_new(x);
+      |              ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2354:29: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 2354 |         struct symbol *sp = Symbol_new(x);
+      |                             ^~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Parse’:
+../htmlwidget/tools/lemon.c:2433:6: warning: old-style function definition [-Wold-style-definition]
+ 2433 | void Parse(gp)
+      |      ^~~~~
+../htmlwidget/tools/lemon.c:2435:1: error: number of arguments doesn’t match prototype
+ 2435 | {
+      | ^
+../htmlwidget/tools/lemon.c:83:6: error: prototype declaration
+   83 | void Parse(/* struct lemon *lemp */);
+      |      ^~~~~
+../htmlwidget/tools/lemon.c:2460:21: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2460 |   filebuf = (char *)malloc( filesize+1 );
+      |                     ^~~~~~  ~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Plink_new’:
+../htmlwidget/tools/lemon.c:2592:38: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2592 |     plink_freelist = (struct plink *)malloc( sizeof(struct plink)*amt );
+      |                                      ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Plink_add’:
+../htmlwidget/tools/lemon.c:2607:6: warning: old-style function definition [-Wold-style-definition]
+ 2607 | void Plink_add(plpp,cfp)
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c:2610:1: error: number of arguments doesn’t match prototype
+ 2610 | {
+      | ^
+../htmlwidget/tools/lemon.c:87:6: error: prototype declaration
+   87 | void Plink_add(/* struct plink **, struct config * */);
+      |      ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Plink_copy’:
+../htmlwidget/tools/lemon.c:2619:6: warning: old-style function definition [-Wold-style-definition]
+ 2619 | void Plink_copy(to,from)
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2622:1: error: number of arguments doesn’t match prototype
+ 2622 | {
+      | ^
+../htmlwidget/tools/lemon.c:88:6: error: prototype declaration
+   88 | void Plink_copy(/* struct plink **, struct plink * */);
+      |      ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Plink_delete’:
+../htmlwidget/tools/lemon.c:2633:6: warning: old-style function definition [-Wold-style-definition]
+ 2633 | void Plink_delete(plp)
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:2635:1: error: number of arguments doesn’t match prototype
+ 2635 | {
+      | ^
+../htmlwidget/tools/lemon.c:89:6: error: prototype declaration
+   89 | void Plink_delete(/* struct plink * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘file_makename’:
+../htmlwidget/tools/lemon.c:2654:15: warning: old-style function definition [-Wold-style-definition]
+ 2654 | PRIVATE char *file_makename(lemp,suffix)
+      |               ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:2661:10: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2661 |   name = malloc( strlen(lemp->filename) + strlen(suffix) + 5 );
+      |          ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘file_open’:
+../htmlwidget/tools/lemon.c:2676:15: warning: old-style function definition [-Wold-style-definition]
+ 2676 | PRIVATE FILE *file_open(lemp,suffix,mode)
+      |               ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Reprint’:
+../htmlwidget/tools/lemon.c:2696:6: warning: old-style function definition [-Wold-style-definition]
+ 2696 | void Reprint(lemp)
+      |      ^~~~~~~
+../htmlwidget/tools/lemon.c:2698:1: error: number of arguments doesn’t match prototype
+ 2698 | {
+      | ^
+../htmlwidget/tools/lemon.c:92:6: error: prototype declaration
+   92 | void Reprint(/* struct lemon * */);
+      |      ^~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:2716:7: note: in expansion of macro ‘assert’
+ 2716 |       assert( sp->index==j );
+      |       ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘ConfigPrint’:
+../htmlwidget/tools/lemon.c:2742:6: warning: old-style function definition [-Wold-style-definition]
+ 2742 | void ConfigPrint(fp,cfp)
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘ReportOutput’:
+../htmlwidget/tools/lemon.c:2832:6: warning: old-style function definition [-Wold-style-definition]
+ 2832 | void ReportOutput(lemp)
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:2834:1: error: number of arguments doesn’t match prototype
+ 2834 | {
+      | ^
+../htmlwidget/tools/lemon.c:93:6: error: prototype declaration
+   93 | void ReportOutput(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘pathsearch’:
+../htmlwidget/tools/lemon.c:2879:15: warning: old-style function definition [-Wold-style-definition]
+ 2879 | PRIVATE char *pathsearch(argv0,name,modemask)
+      |               ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:2897:20: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2897 |     path = (char *)malloc( strlen(argv0) + strlen(name) + 2 );
+      |                    ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2901:18: error: conflicting types for ‘getenv’; have ‘char *(void)’
+ 2901 |     extern char *getenv();
+      |                  ^~~~~~
+/usr/include/stdlib.h:773:14: note: previous declaration of ‘getenv’ with type ‘char *(const char *)’
+  773 | extern char *getenv (const char *__name) __THROW __nonnull ((1)) __wur;
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2902:16: error: too many arguments to function ‘getenv’; expected 0, have 1
+ 2902 |     pathlist = getenv("PATH");
+      |                ^~~~~~ ~~~~~~
+../htmlwidget/tools/lemon.c:2901:18: note: declared here
+ 2901 |     extern char *getenv();
+      |                  ^~~~~~
+../htmlwidget/tools/lemon.c:2904:20: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 2904 |     path = (char *)malloc( strlen(pathlist)+strlen(name)+2 );
+      |                    ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:2915:13: error: too many arguments to function ‘access’; expected 0, have 2
+ 2915 |         if( access(path,modemask)==0 ) break;
+      |             ^~~~~~ ~~~~
+../htmlwidget/tools/lemon.c:2887:14: note: declared here
+ 2887 |   extern int access();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘compute_action’:
+../htmlwidget/tools/lemon.c:2926:13: warning: old-style function definition [-Wold-style-definition]
+ 2926 | PRIVATE int compute_action(lemp,ap)
+      |             ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘tplt_xfer’:
+../htmlwidget/tools/lemon.c:2951:14: warning: old-style function definition [-Wold-style-definition]
+ 2951 | PRIVATE void tplt_xfer(name,in,out,lineno)
+      |              ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘tplt_open’:
+../htmlwidget/tools/lemon.c:2980:15: warning: old-style function definition [-Wold-style-definition]
+ 2980 | PRIVATE FILE *tplt_open(lemp)
+      |               ^~~~~~~~~
+../htmlwidget/tools/lemon.c:2995:7: error: implicit declaration of function ‘access’ [-Wimplicit-function-declaration]
+ 2995 |   if( access(buf,004)==0 ){
+      |       ^~~~~~
+../htmlwidget/tools/lemon.c:2887:14: note: previous declaration of ‘access’ with type ‘int(void)’
+ 2887 |   extern int access();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘tplt_linedir’:
+../htmlwidget/tools/lemon.c:3018:14: warning: old-style function definition [-Wold-style-definition]
+ 3018 | PRIVATE void tplt_linedir(out,lineno,filename)
+      |              ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘tplt_print’:
+../htmlwidget/tools/lemon.c:3033:14: warning: old-style function definition [-Wold-style-definition]
+ 3033 | PRIVATE void tplt_print(out,lemp,str,strln,lineno)
+      |              ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘emit_destructor_code’:
+../htmlwidget/tools/lemon.c:3061:6: warning: old-style function definition [-Wold-style-definition]
+ 3061 | void emit_destructor_code(out,sp,lemp,lineno)
+      |      ^~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:3085:4: note: in expansion of macro ‘assert’
+ 3085 |    assert( 0 );  /* Cannot happen */
+      |    ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘has_destructor’:
+../htmlwidget/tools/lemon.c:3105:5: warning: old-style function definition [-Wold-style-definition]
+ 3105 | int has_destructor(sp, lemp)
+      |     ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘append_str’:
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:3144:7: note: in expansion of macro ‘assert’
+ 3144 |       assert( used>=0 );
+      |       ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘translate_code’:
+../htmlwidget/tools/lemon.c:3249:14: error: too many arguments to function ‘Strsafe’; expected 0, have 1
+ 3249 |   rp->code = Strsafe(cp);
+      |              ^~~~~~~ ~~
+../htmlwidget/tools/lemon.c:296:7: note: declared here
+  296 | char *Strsafe();
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘emit_code’:
+../htmlwidget/tools/lemon.c:3256:14: warning: old-style function definition [-Wold-style-definition]
+ 3256 | PRIVATE void emit_code(out,rp,lemp,lineno)
+      |              ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘print_stack_union’:
+../htmlwidget/tools/lemon.c:3287:6: warning: old-style function definition [-Wold-style-definition]
+ 3287 | void print_stack_union(out,lemp,plineno,mhflag)
+      |      ^~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3304:19: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 3304 |   types = (char**)malloc( arraysize * sizeof(char*) );
+      |                   ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:3317:18: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 3317 |   stddt = (char*)malloc( maxdtlength*2 + 1 );
+      |                  ^~~~~~  ~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:3362:28: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 3362 |       types[hash] = (char*)malloc( strlen(stddt)+1 );
+      |                            ^~~~~~  ~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘ReportTable’:
+../htmlwidget/tools/lemon.c:3436:6: warning: old-style function definition [-Wold-style-definition]
+ 3436 | void ReportTable(lemp, mhflag)
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3439:1: error: number of arguments doesn’t match prototype
+ 3439 | {
+      | ^
+../htmlwidget/tools/lemon.c:94:6: error: prototype declaration
+   94 | void ReportTable(/* struct lemon * */);
+      |      ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3551:8: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 3551 |   ax = malloc( sizeof(ax[0])*lemp->nstate*2 );
+      |        ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:3730:5: note: in expansion of macro ‘assert’
+ 3730 |     assert( rp->index==i );
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘ReportHeader’:
+../htmlwidget/tools/lemon.c:3851:6: warning: old-style function definition [-Wold-style-definition]
+ 3851 | void ReportHeader(lemp)
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3853:1: error: number of arguments doesn’t match prototype
+ 3853 | {
+      | ^
+../htmlwidget/tools/lemon.c:95:6: error: prototype declaration
+   95 | void ReportHeader(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘CompressTables’:
+../htmlwidget/tools/lemon.c:3890:6: warning: old-style function definition [-Wold-style-definition]
+ 3890 | void CompressTables(lemp)
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3892:1: error: number of arguments doesn’t match prototype
+ 3892 | {
+      | ^
+../htmlwidget/tools/lemon.c:96:6: error: prototype declaration
+   96 | void CompressTables(/* struct lemon * */);
+      |      ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:40:29: error: too many arguments to function ‘myassert’; expected 0, have 2
+   40 | #  define assert(X) if(!(X))myassert(__FILE__,__LINE__)
+      |                             ^~~~~~~~
+../htmlwidget/tools/lemon.c:3930:5: note: in expansion of macro ‘assert’
+ 3930 |     assert( ap );
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:564:6: note: declared here
+  564 | void myassert(file,line)
+      |      ^~~~~~~~
+../htmlwidget/tools/lemon.c:3931:14: error: too many arguments to function ‘Symbol_new’; expected 0, have 1
+ 3931 |     ap->sp = Symbol_new("{default}");
+      |              ^~~~~~~~~~ ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:304:16: note: declared here
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:3935:15: error: too many arguments to function ‘Action_sort’; expected 0, have 1
+ 3935 |     stp->ap = Action_sort(stp->ap);
+      |               ^~~~~~~~~~~ ~~~~~~~
+../htmlwidget/tools/lemon.c:371:16: note: declared here
+  371 | struct action *Action_sort(ap)
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘ResortStates’:
+../htmlwidget/tools/lemon.c:3963:6: warning: old-style function definition [-Wold-style-definition]
+ 3963 | void ResortStates(lemp)
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:3965:1: error: number of arguments doesn’t match prototype
+ 3965 | {
+      | ^
+../htmlwidget/tools/lemon.c:97:6: error: prototype declaration
+   97 | void ResortStates(/* struct lemon * */);
+      |      ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘SetSize’:
+../htmlwidget/tools/lemon.c:4004:6: warning: old-style function definition [-Wold-style-definition]
+ 4004 | void SetSize(n)
+      |      ^~~~~~~
+../htmlwidget/tools/lemon.c:4006:1: error: number of arguments doesn’t match prototype
+ 4006 | {
+      | ^
+../htmlwidget/tools/lemon.c:100:7: error: prototype declaration
+  100 | void  SetSize(/* int N */);             /* All sets will be of size N */
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘SetNew’:
+../htmlwidget/tools/lemon.c:4014:14: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4014 |   s = (char*)malloc( size );
+      |              ^~~~~~  ~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘SetFree’:
+../htmlwidget/tools/lemon.c:4024:6: warning: old-style function definition [-Wold-style-definition]
+ 4024 | void SetFree(s)
+      |      ^~~~~~~
+../htmlwidget/tools/lemon.c:4026:1: error: number of arguments doesn’t match prototype
+ 4026 | {
+      | ^
+../htmlwidget/tools/lemon.c:102:7: error: prototype declaration
+  102 | void  SetFree(/* char* */);             /* Deallocate a set */
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘SetAdd’:
+../htmlwidget/tools/lemon.c:4032:5: warning: old-style function definition [-Wold-style-definition]
+ 4032 | int SetAdd(s,e)
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c:4035:1: error: number of arguments doesn’t match prototype
+ 4035 | {
+      | ^
+../htmlwidget/tools/lemon.c:104:5: error: prototype declaration
+  104 | int SetAdd(/* char*,int */);            /* Add element to a set */
+      |     ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘SetUnion’:
+../htmlwidget/tools/lemon.c:4043:5: warning: old-style function definition [-Wold-style-definition]
+ 4043 | int SetUnion(s1,s2)
+      |     ^~~~~~~~
+../htmlwidget/tools/lemon.c:4046:1: error: number of arguments doesn’t match prototype
+ 4046 | {
+      | ^
+../htmlwidget/tools/lemon.c:105:5: error: prototype declaration
+  105 | int SetUnion(/* char *A,char *B */);    /* A <- A U B, thru element N */
+      |     ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘strhash’:
+../htmlwidget/tools/lemon.c:4071:13: warning: old-style function definition [-Wold-style-definition]
+ 4071 | PRIVATE int strhash(x)
+      |             ^~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Strsafe’:
+../htmlwidget/tools/lemon.c:4083:7: warning: old-style function definition [-Wold-style-definition]
+ 4083 | char *Strsafe(y)
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c:4085:1: error: number of arguments doesn’t match prototype
+ 4085 | {
+      | ^
+../htmlwidget/tools/lemon.c:296:7: error: prototype declaration
+  296 | char *Strsafe();
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c:4088:7: error: too many arguments to function ‘Strsafe_find’; expected 0, have 1
+ 4088 |   z = Strsafe_find(y);
+      |       ^~~~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:300:7: note: declared here
+  300 | char *Strsafe_find(/* char * */);
+      |       ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4089:18: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4089 |   if( z==0 && (z=malloc( strlen(y)+1 ))!=0 ){
+      |                  ^~~~~~  ~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4091:5: error: too many arguments to function ‘Strsafe_insert’; expected 0, have 1
+ 4091 |     Strsafe_insert(z);
+      |     ^~~~~~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:299:5: note: declared here
+  299 | int Strsafe_insert(/* char * */);
+      |     ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Strsafe_init’:
+../htmlwidget/tools/lemon.c:4124:23: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4124 |   x1a = (struct s_x1*)malloc( sizeof(struct s_x1) );
+      |                       ^~~~~~  ~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4128:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4128 |     x1a->tbl = (x1node*)malloc(
+      |                         ^~~~~~
+ 4129 |       (sizeof(x1node) + sizeof(x1node*))*1024 );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Strsafe_insert’:
+../htmlwidget/tools/lemon.c:4142:5: warning: old-style function definition [-Wold-style-definition]
+ 4142 | int Strsafe_insert(data)
+      |     ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4144:1: error: number of arguments doesn’t match prototype
+ 4144 | {
+      | ^
+../htmlwidget/tools/lemon.c:299:5: error: prototype declaration
+  299 | int Strsafe_insert(/* char * */);
+      |     ^~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4167:26: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4167 |     array.tbl = (x1node*)malloc(
+      |                          ^~~~~~
+ 4168 |       (sizeof(x1node) + sizeof(x1node*))*size );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Strsafe_find’:
+../htmlwidget/tools/lemon.c:4199:7: warning: old-style function definition [-Wold-style-definition]
+ 4199 | char *Strsafe_find(key)
+      |       ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4201:1: error: number of arguments doesn’t match prototype
+ 4201 | {
+      | ^
+../htmlwidget/tools/lemon.c:300:7: error: prototype declaration
+  300 | char *Strsafe_find(/* char * */);
+      |       ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_new’:
+../htmlwidget/tools/lemon.c:4218:16: warning: old-style function definition [-Wold-style-definition]
+ 4218 | struct symbol *Symbol_new(x)
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:4220:1: error: number of arguments doesn’t match prototype
+ 4220 | {
+      | ^
+../htmlwidget/tools/lemon.c:304:16: error: prototype declaration
+  304 | struct symbol *Symbol_new();
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:4223:8: error: too many arguments to function ‘Symbol_find’; expected 0, have 1
+ 4223 |   sp = Symbol_find(x);
+      |        ^~~~~~~~~~~ ~
+../htmlwidget/tools/lemon.c:308:16: note: declared here
+  308 | struct symbol *Symbol_find(/* char * */);
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4225:27: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4225 |     sp = (struct symbol *)malloc( sizeof(struct symbol) );
+      |                           ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4227:16: error: too many arguments to function ‘Strsafe’; expected 0, have 1
+ 4227 |     sp->name = Strsafe(x);
+      |                ^~~~~~~ ~
+../htmlwidget/tools/lemon.c:4083:7: note: declared here
+ 4083 | char *Strsafe(y)
+      |       ^~~~~~~
+../htmlwidget/tools/lemon.c:4237:5: error: too many arguments to function ‘Symbol_insert’; expected 0, have 2
+ 4237 |     Symbol_insert(sp,sp->name);
+      |     ^~~~~~~~~~~~~ ~~
+../htmlwidget/tools/lemon.c:307:5: note: declared here
+  307 | int Symbol_insert(/* struct symbol *, char * */);
+      |     ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c: At top level:
+../htmlwidget/tools/lemon.c:4252:5: error: conflicting types for ‘Symbolcmpp’; have ‘int(struct symbol **, struct symbol **)’
+ 4252 | int Symbolcmpp(struct symbol **a, struct symbol **b){
+      |     ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:305:5: note: previous declaration of ‘Symbolcmpp’ with type ‘int(void)’
+  305 | int Symbolcmpp(/* struct symbol **, struct symbol ** */);
+      |     ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_init’:
+../htmlwidget/tools/lemon.c:4286:23: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4286 |   x2a = (struct s_x2*)malloc( sizeof(struct s_x2) );
+      |                       ^~~~~~  ~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4290:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4290 |     x2a->tbl = (x2node*)malloc(
+      |                         ^~~~~~
+ 4291 |       (sizeof(x2node) + sizeof(x2node*))*128 );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_insert’:
+../htmlwidget/tools/lemon.c:4304:5: warning: old-style function definition [-Wold-style-definition]
+ 4304 | int Symbol_insert(data,key)
+      |     ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4307:1: error: number of arguments doesn’t match prototype
+ 4307 | {
+      | ^
+../htmlwidget/tools/lemon.c:307:5: error: prototype declaration
+  307 | int Symbol_insert(/* struct symbol *, char * */);
+      |     ^~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4330:26: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4330 |     array.tbl = (x2node*)malloc(
+      |                          ^~~~~~
+ 4331 |       (sizeof(x2node) + sizeof(x2node*))*size );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_find’:
+../htmlwidget/tools/lemon.c:4364:16: warning: old-style function definition [-Wold-style-definition]
+ 4364 | struct symbol *Symbol_find(key)
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4366:1: error: number of arguments doesn’t match prototype
+ 4366 | {
+      | ^
+../htmlwidget/tools/lemon.c:308:16: error: prototype declaration
+  308 | struct symbol *Symbol_find(/* char * */);
+      |                ^~~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_Nth’:
+../htmlwidget/tools/lemon.c:4381:16: warning: old-style function definition [-Wold-style-definition]
+ 4381 | struct symbol *Symbol_Nth(n)
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:4383:1: error: number of arguments doesn’t match prototype
+ 4383 | {
+      | ^
+../htmlwidget/tools/lemon.c:309:16: error: prototype declaration
+  309 | struct symbol *Symbol_Nth(/* int */);
+      |                ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Symbol_arrayof’:
+../htmlwidget/tools/lemon.c:4408:29: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4408 |   array = (struct symbol **)malloc( sizeof(struct symbol *)*size );
+      |                             ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configcmp’:
+../htmlwidget/tools/lemon.c:4416:5: warning: old-style function definition [-Wold-style-definition]
+ 4416 | int Configcmp(a,b)
+      |     ^~~~~~~~~
+../htmlwidget/tools/lemon.c:4419:1: error: number of arguments doesn’t match prototype
+ 4419 | {
+      | ^
+../htmlwidget/tools/lemon.c:315:5: error: prototype declaration
+  315 | int Configcmp(/* struct config *, struct config * */);
+      |     ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘statecmp’:
+../htmlwidget/tools/lemon.c:4427:13: warning: old-style function definition [-Wold-style-definition]
+ 4427 | PRIVATE int statecmp(a,b)
+      |             ^~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘statehash’:
+../htmlwidget/tools/lemon.c:4444:13: warning: old-style function definition [-Wold-style-definition]
+ 4444 | PRIVATE int statehash(a)
+      |             ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘State_new’:
+../htmlwidget/tools/lemon.c:4459:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4459 |   new = (struct state *)malloc( sizeof(struct state) );
+      |                         ^~~~~~  ~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘State_init’:
+../htmlwidget/tools/lemon.c:4492:23: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4492 |   x3a = (struct s_x3*)malloc( sizeof(struct s_x3) );
+      |                       ^~~~~~  ~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4496:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4496 |     x3a->tbl = (x3node*)malloc(
+      |                         ^~~~~~
+ 4497 |       (sizeof(x3node) + sizeof(x3node*))*128 );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘State_insert’:
+../htmlwidget/tools/lemon.c:4510:5: warning: old-style function definition [-Wold-style-definition]
+ 4510 | int State_insert(data,key)
+      |     ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4513:1: error: number of arguments doesn’t match prototype
+ 4513 | {
+      | ^
+../htmlwidget/tools/lemon.c:318:5: error: prototype declaration
+  318 | int State_insert(/* struct state *, struct config * */);
+      |     ^~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4536:26: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4536 |     array.tbl = (x3node*)malloc(
+      |                          ^~~~~~
+ 4537 |       (sizeof(x3node) + sizeof(x3node*))*size );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘State_find’:
+../htmlwidget/tools/lemon.c:4570:15: warning: old-style function definition [-Wold-style-definition]
+ 4570 | struct state *State_find(key)
+      |               ^~~~~~~~~~
+../htmlwidget/tools/lemon.c:4572:1: error: number of arguments doesn’t match prototype
+ 4572 | {
+      | ^
+../htmlwidget/tools/lemon.c:319:15: error: prototype declaration
+  319 | struct state *State_find(/* struct config * */);
+      |               ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘State_arrayof’:
+../htmlwidget/tools/lemon.c:4595:28: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4595 |   array = (struct state **)malloc( sizeof(struct state *)*size );
+      |                            ^~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘confighash’:
+../htmlwidget/tools/lemon.c:4603:13: warning: old-style function definition [-Wold-style-definition]
+ 4603 | PRIVATE int confighash(a)
+      |             ^~~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configtable_init’:
+../htmlwidget/tools/lemon.c:4638:23: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4638 |   x4a = (struct s_x4*)malloc( sizeof(struct s_x4) );
+      |                       ^~~~~~  ~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c:4642:25: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4642 |     x4a->tbl = (x4node*)malloc(
+      |                         ^~~~~~
+ 4643 |       (sizeof(x4node) + sizeof(x4node*))*64 );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configtable_insert’:
+../htmlwidget/tools/lemon.c:4656:5: warning: old-style function definition [-Wold-style-definition]
+ 4656 | int Configtable_insert(data)
+      |     ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4658:1: error: number of arguments doesn’t match prototype
+ 4658 | {
+      | ^
+../htmlwidget/tools/lemon.c:325:5: error: prototype declaration
+  325 | int Configtable_insert(/* struct config * */);
+      |     ^~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4668:9: error: too many arguments to function ‘Configcmp’; expected 0, have 2
+ 4668 |     if( Configcmp(np->data,data)==0 ){
+      |         ^~~~~~~~~ ~~~~~~~~
+../htmlwidget/tools/lemon.c:4416:5: note: declared here
+ 4416 | int Configcmp(a,b)
+      |     ^~~~~~~~~
+../htmlwidget/tools/lemon.c:4681:26: error: too many arguments to function ‘malloc’; expected 0, have 1
+ 4681 |     array.tbl = (x4node*)malloc(
+      |                          ^~~~~~
+ 4682 |       (sizeof(x4node) + sizeof(x4node*))*size );
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:31:14: note: declared here
+   31 | extern void *malloc();
+      |              ^~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configtable_find’:
+../htmlwidget/tools/lemon.c:4713:16: warning: old-style function definition [-Wold-style-definition]
+ 4713 | struct config *Configtable_find(key)
+      |                ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4715:1: error: number of arguments doesn’t match prototype
+ 4715 | {
+      | ^
+../htmlwidget/tools/lemon.c:326:16: error: prototype declaration
+  326 | struct config *Configtable_find(/* struct config * */);
+      |                ^~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4723:9: error: too many arguments to function ‘Configcmp’; expected 0, have 2
+ 4723 |     if( Configcmp(np->data,key)==0 ) break;
+      |         ^~~~~~~~~ ~~~~~~~~
+../htmlwidget/tools/lemon.c:4416:5: note: declared here
+ 4416 | int Configcmp(a,b)
+      |     ^~~~~~~~~
+../htmlwidget/tools/lemon.c: In function ‘Configtable_clear’:
+../htmlwidget/tools/lemon.c:4731:6: warning: old-style function definition [-Wold-style-definition]
+ 4731 | void Configtable_clear(f)
+      |      ^~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4733:1: error: number of arguments doesn’t match prototype
+ 4733 | {
+      | ^
+../htmlwidget/tools/lemon.c:327:6: error: prototype declaration
+  327 | void Configtable_clear(/* int(*)(struct config *) */);
+      |      ^~~~~~~~~~~~~~~~~
+../htmlwidget/tools/lemon.c:4736:40: error: too many arguments to function ‘f’; expected 0, have 1
+ 4736 |   if( f ) for(i=0; i<x4a->count; i++) (*f)(x4a->tbl[i].data);
+      |                                       ~^~~ ~~~~~~~~~~~~~~~~
+make: *** [Makefile:309: lemon] Error 1
