@@ -205,7 +205,7 @@ struct CanvasText {
     int iIndex;              /* Index in pNode text of this item (or -1) */
 
     const char *zText;
-    int nText;
+    Tcl_Size nText;
 };
 
 /* A square box, with borders, background color and image as determined
@@ -265,8 +265,8 @@ struct CanvasWindow {
     int x;                   /* Relative x coordinate */
     int y;                   /* Relative y coordinate */
     HtmlElementNode *pElem;  /* Node replaced by this window */
-    int iWidth;              /* CSS determined width of widget */
-    int iHeight;             /* CSS determined height of widget */
+    int iWidth;              /* Pixel width - internal calc */
+    int iHeight;             /* Pixel height - internal calc */
 };
 
 /*
@@ -284,7 +284,7 @@ struct CanvasOrigin {
     int y;
     int horizontal;
     int vertical;
-    int nRef;
+    Tcl_Size nRef;
     HtmlCanvasItem *pSkip;
 };
 
@@ -326,7 +326,7 @@ struct CanvasMarker {
 struct HtmlCanvasItem {
     int type;
     int iSnapshot;            /* id of last snapshot this was added to */
-    int nRef;                 /* Number of pointers to this item */
+    Tcl_Size nRef;                 /* Number of pointers to this item */
     union {
         struct GenericItem {
             int x;
@@ -387,8 +387,8 @@ CHECK_CANVAS(pCanvas)
     HtmlCanvasItem *pPrev = 0; 
 
     int bSeenFixed = 0;
-    int nOriginStart = 0;
-    int nOriginFin = 0;
+    Tcl_Size nOriginStart = 0;
+    Tcl_Size nOriginFin = 0;
     int ox = 0;
     int oy = 0;
 
@@ -438,18 +438,18 @@ CHECK_CANVAS(pCanvas)
  */
 struct CanvasItemSorter {
     int iSnapshot;                      /* Non-zero for a snapshot */
-    int nLevel;                         /* Number of allocated levels */
+    Tcl_Size nLevel;                         /* Number of allocated levels */
     CanvasItemSorterLevel *aLevel;      /* Array of levels */  
 
     struct OverflowAndPixmap {
         Overflow overflow;
         Pixmap pixmap;
     } *aOverflowAndPixmap;
-    int nOverflowAndPixmap;             /* Allocated size of aOver... */
+    Tcl_Size nOverflowAndPixmap;             /* Allocated size of aOver... */
 };
 struct CanvasItemSorterLevel {
     int iSlot;                       /* Index of next free entry in aSlot */
-    int nSlot;                       /* Allocated size of aSlot */
+    Tcl_Size nSlot;                       /* Allocated size of aSlot */
     CanvasItemSorterSlot *aSlot;     /* Array of slots to store items */
 };
 struct CanvasItemSorterSlot {
@@ -617,7 +617,7 @@ byteToCharOffset(z, iByte)
     int iByte;
 {
     int iChar = 0;
-    int i;
+    Tcl_Size i;
     for (i = 0; i < iByte; i++) {
         if (!(z[i] & 0x80)) iChar++;
     }
@@ -628,7 +628,7 @@ charToByteOffset(z, iChar)
     const unsigned char *z;
     int iChar;
 {
-    int i = iChar;
+    Tcl_Size i = iChar;
     int iByte;
     for (iByte = 0; i > 0; iByte++) {
         if (!(z[iByte] & 0x80)) i--;
@@ -673,8 +673,8 @@ windowsRepair(pTree, pCanvas)
         HtmlNodeReplacement *pNext = p->pNext;
         Tk_Window control = p->win;
         int iViewY;
-        int iWidth;
-        int iHeight;
+        Tcl_Size iWidth;
+        Tcl_Size iHeight;
         int iViewX;
 
         if (pTree) {
@@ -1291,7 +1291,7 @@ HtmlDrawLine(pCanvas, x, w, y_over, y_through, y_under, pNode, size_only)
 void HtmlDrawText(pCanvas, zText, nText, x, y, w, size_only, pNode, iIndex)
     HtmlCanvas *pCanvas; 
     const char *zText;
-    int nText;
+    Tcl_Size nText;
     int x;
     int y;
     int w;
@@ -1308,7 +1308,7 @@ void HtmlDrawText(pCanvas, zText, nText, x, y, w, size_only, pNode, iIndex)
             pItem = allocateCanvasItem();
             pItem->x.t.zText = zText;
         } else {
-            int nBytes = nText + sizeof(HtmlCanvasItem);
+            Tcl_Size nBytes = nText + sizeof(HtmlCanvasItem);
             pItem = (HtmlCanvasItem *)HtmlClearAlloc("HtmlCanvasItem", nBytes);
             pItem->x.t.zText = (char *)&pItem[1];
             memcpy((char *)pItem->x.t.zText, zText, nText);
@@ -1335,8 +1335,8 @@ void HtmlDrawText(pCanvas, zText, nText, x, y, w, size_only, pNode, iIndex)
 void
 HtmlDrawTextExtend(pCanvas, nChar, nPixel) 
     HtmlCanvas *pCanvas;
-    int nChar; 
-    int nPixel; 
+    Tcl_Size nChar; 
+    Tcl_Size nPixel; 
 {
     assert(pCanvas && pCanvas->pLast && pCanvas->pLast->type == CANVAS_TEXT);
     pCanvas->pLast->x.t.nText += nChar;
@@ -1452,7 +1452,7 @@ int HtmlLayoutPrimitives(clientData, interp, objc, objv)
 {
     HtmlCanvasItem *pItem;
     Tcl_Obj *aObj[13];
-    int nObj = 0;
+    Tcl_Size nObj = 0;
     HtmlTree *pTree = (HtmlTree *)clientData;
     HtmlCanvas *pCanvas = &pTree->canvas;
     Tcl_Obj *pPrimitives;
@@ -1609,7 +1609,7 @@ setClippingDrawable(pQuery, pItem, pDrawable, pX, pY)
 
         itemToBox(pItem, *pX + pQuery->x, *pY + pQuery->y, &x, &y, &w, &h);
         if (pItem->type == CANVAS_TEXT) {
-            int nSpace = 0;
+            Tcl_Size nSpace = 0;
             CanvasText *pText = &pItem->x.t;
             for (ii = pText->nText - 1; ii >= 0; ii--) {
               if (pText->zText[ii] == '\xA0' && pText->zText[ii-1] == '\xC2') {
@@ -2133,13 +2133,13 @@ drawBox(pQuery, pItem, pBox, drawable, x, y, w, h, xview, yview, flags)
 
             if (eR != CSS_CONST_REPEAT && eR != CSS_CONST_REPEAT_X) {
                 int draw_x1 = MAX(bg_x, iPosX);
-                int draw_x2 = MIN(bg_x + bg_w, iPosX + iWidth);
+                Tcl_Size draw_x2 = MIN(bg_x + bg_w, iPosX + iWidth);
                 bg_x = draw_x1;
                 bg_w = draw_x2 - draw_x1;
             } 
             if (eR != CSS_CONST_REPEAT && eR != CSS_CONST_REPEAT_Y) {
                 int draw_y1 = MAX(bg_y, iPosY);
-                int draw_y2 = MIN(bg_y + bg_h, iPosY + iHeight);
+                Tcl_Size draw_y2 = MIN(bg_y + bg_h, iPosY + iHeight);
                 bg_y = draw_y1;
                 bg_h = draw_y2 - draw_y1;
             }
@@ -2396,7 +2396,7 @@ drawText(pQuery, pItem, drawable, x, y)
     
         if (iSelTo > 0 && iSelFrom <= n && iSelTo >= iSelFrom) {
             CONST char *zSel = &z[iSelFrom];
-            int nSel;
+            Tcl_Size nSel;
             int w;                  /* Pixels of tagged text */
             int xs = x;             /* Pixel offset of tagged text */
             int h;                  /* Height of text line */
@@ -2469,16 +2469,16 @@ searchCanvas(pTree, ymin, ymax, xFunc, clientData, requireOverflow)
     int origin_x = 0;
     int origin_y = 0;
     int rc = 0;
-    int nTest = 0;
-    int nCallback = 0;
+    Tcl_Size nTest = 0;
+    Tcl_Size nCallback = 0;
 
     /* The overflow stack. Grown using HtmlRealloc(). */
     Overflow **apOverflow = 0;
-    int nOverflow = 0;
+    Tcl_Size nOverflow = 0;
     int iOverflow = -1;
 
     /* Debugging variables to support assert() statements */
-    int nOrigin = 0;
+    Tcl_Size nOrigin = 0;
     int bSeenFixedMarker = 0;
      
     for (pItem = pCanvas->pFirst; pItem; pItem = (pSkip?pSkip:pItem->pNext)) {
@@ -2839,8 +2839,8 @@ HtmlDrawSnapshotDamage(pTree, pSnapshot, ppCurrent)
 
     while (pNewSlot && pOldSlot) {
         if (itemsAreEqual(pNewSlot->pItem, pOldSlot->pItem)) {
-            int newx = pNewSlot->x;
-            int newy = pNewSlot->y;
+            Tcl_Size newx = pNewSlot->x;
+            Tcl_Size newy = pNewSlot->y;
             if (pNewSlot->pItem->type == CANVAS_BOX) {
                 newx += pNewSlot->pItem->x.box.x;
                 newy += pNewSlot->pItem->x.box.y;
@@ -3579,8 +3579,8 @@ struct NodeQuery {
 
     /* Variables for building up the result set in */
     HtmlNode **apNode;
-    int nNodeAlloc;
-    int nNode;
+    Tcl_Size nNodeAlloc;
+    Tcl_Size nNode;
 };
 
 static int
@@ -3617,7 +3617,7 @@ layoutNodeCb(pItem, origin_x, origin_y, pOverflow, clientData)
         y <= pQuery->y && (y + h) >= pQuery->y &&
         !HtmlNodeIsOrphan(pNode)
     ) {
-        int i;
+        Tcl_Size i;
 
         /* If the applicable visibility property is set to "hidden", do
          * not include this node in the set returned by [pathName node].
@@ -3637,7 +3637,7 @@ layoutNodeCb(pItem, origin_x, origin_y, pOverflow, clientData)
 
         pQuery->nNode++;
         if (pQuery->nNode > pQuery->nNodeAlloc) {
-            int nByte;
+            Tcl_Size nByte;
             pQuery->nNodeAlloc += 16;
             nByte = pQuery->nNodeAlloc * sizeof(HtmlNode *);
             pQuery->apNode = (HtmlNode**)HtmlRealloc(0, pQuery->apNode, nByte);
@@ -3655,8 +3655,8 @@ layoutNodeCompare(pVoidLeft, pVoidRight)
 {
     HtmlNode *pLeft = *(HtmlNode **)pVoidLeft;
     HtmlNode *pRight = *(HtmlNode **)pVoidRight;
-    int iLeft = 0;
-    int iRight = 0;
+    Tcl_Size iLeft = 0;
+    Tcl_Size iRight = 0;
 
     if (HtmlNodeIsText(pLeft)) pLeft = HtmlNodeParent(pLeft);
     if (HtmlNodeIsText(pRight)) pRight = HtmlNodeParent(pRight);
@@ -3702,7 +3702,7 @@ layoutNodeCmd(pTree, x, y)
     if (sQuery.nNode == 1) {
         Tcl_SetObjResult(pTree->interp, HtmlNodeCommand(pTree, *sQuery.apNode));
     } else if (sQuery.nNode > 0) {
-        int i;
+        Tcl_Size i;
         Tcl_Obj *pRet = Tcl_NewObj();
         qsort(sQuery.apNode, sQuery.nNode, sizeof(HtmlNode*),layoutNodeCompare);
         for (i = 0; i < sQuery.nNode; i++) {
@@ -3940,7 +3940,7 @@ paintNodesSearchCb(pItem, origin_x, origin_y, pOverflow, clientData)
                     int bottom = origin_y + pT->y + pFont->metrics.descent;
                     int left   = origin_x + pT->x;
                     int right;
-                    int nFin = n;
+                    Tcl_Size nFin = n;
 
                     if (iNode == p->iNodeFin && p->iIndexFin >= 0) {
                         nFin = MIN(n, 1 + p->iIndexFin - pT->iIndex);
@@ -3949,7 +3949,7 @@ paintNodesSearchCb(pItem, origin_x, origin_y, pOverflow, clientData)
                         right = pT->w + left;
                     }
                     if (iNode == p->iNodeStart && p->iIndexStart > 0) {
-                        int nStart = MAX(0, p->iIndexStart - pT->iIndex);
+                        Tcl_Size nStart = MAX(0, p->iIndexStart - pT->iIndex);
                         if (nStart > 0) {
                             assert(nStart <= n);
                             left += Tk_TextWidth(pFont->tkfont, z, nStart);

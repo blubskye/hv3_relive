@@ -96,7 +96,7 @@ explicitCloseCount(pCurrent, eTag, pNClose)
     *pNClose = 0;
     if (eTag != Html_HTML && eTag != Html_BODY && eTag != Html_HEAD) {
         HtmlNode *p;
-        int nLevel = 0;
+        Tcl_Size nLevel = 0;
 
         for (p = pCurrent; p;  p = HtmlNodeParent(p)) {
             nLevel++;
@@ -121,10 +121,10 @@ implicitCloseCount(pTree, pCurrent, eTag, pNClose)
     int eTag;
     int *pNClose;
 {
-    int nClose = 0;
+    Tcl_Size nClose = 0;
 
     if (pCurrent) {
-        int nLevel = 0;
+        Tcl_Size nLevel = 0;
         HtmlNode *p;
         int eCloseRes = TAG_PARENT;
         assert(HtmlNodeAsElement(pCurrent));
@@ -277,7 +277,7 @@ freeNode(pTree, pNode)
     HtmlNode *pNode;
 {
     if( pNode ){
-        int i;
+        Tcl_Size i;
 
         /* Invalidate the cache of the parent node before deleting any
          * child nodes. This is because invalidating a cache may involve
@@ -352,7 +352,7 @@ nodeGetPreText(pTextNode)
         char *zWhite = " ";
 
         int eType = HtmlTextIterType(&sIter);
-        int nData = HtmlTextIterLength(&sIter);
+        Tcl_Size nData = HtmlTextIterLength(&sIter);
         char const * zData = HtmlTextIterData(&sIter);
 
         switch (eType) {
@@ -473,7 +473,7 @@ HtmlElementNormalize(pElem)
  *
  *---------------------------------------------------------------------------
  */
-static int 
+static Tcl_Size 
 nodeHandlerCallbacks(pTree, pNode)
     HtmlTree *pTree;
     HtmlNode *pNode;
@@ -802,9 +802,9 @@ setNodeAttribute(pNode, zAttrName, zAttrVal)
     char const *azPtr[MAX_NUM_ATTRIBUTES * 2];
     int aLen[MAX_NUM_ATTRIBUTES * 2];
 
-    int i;
+    Tcl_Size i;
     int isDone = 0;
-    int nArgs;
+    Tcl_Size nArgs;
     HtmlElementNode *pElem;
     HtmlAttributes *pAttr;
 
@@ -890,7 +890,7 @@ doParseHandler(pTree, eType, pNode, iOffset)
     HtmlTree *pTree;
     int eType;
     HtmlNode *pNode;
-    int iOffset;
+    Tcl_Size iOffset;
 {
     int rc = TCL_OK;
     Tcl_HashEntry *pEntry;
@@ -1056,7 +1056,7 @@ treeAddFosterElement(pTree, eTag, pAttr)
     pFosterParent = findFosterParent(pTree, &pBefore);
 
     if (pFoster) {
-        int nClose;
+        Tcl_Size nClose;
         int ii;
         implicitCloseCount(pTree, pTree->state.pFoster, eTag, &nClose);
         for (
@@ -1100,7 +1100,7 @@ treeAddFosterClosingTag(pTree, eTag)
     HtmlNode *pFosterParent;
     HtmlNode *pFoster;
     int ii;
-    int nClose;
+    Tcl_Size nClose;
 
     /* Find the parent of the <TABLE> element (the foster-parent) */
     pFosterParent = findFosterParent(pTree, 0);
@@ -1246,7 +1246,7 @@ HtmlTreeAddElement(pTree, eType, pAttr, iOffset)
      * element before proceeding.
      */
     if (pTree->state.isCdataInHead) {
-        int nChild = HtmlNodeNumChildren(pHeadNode) - 1;
+        Tcl_Size nChild = HtmlNodeNumChildren(pHeadNode) - 1;
         HtmlNode *pTitle = HtmlNodeChild(pHeadNode, nChild);
         nodeHandlerCallbacks(pTree, pTitle);
     }
@@ -1327,8 +1327,8 @@ HtmlTreeAddElement(pTree, eType, pAttr, iOffset)
                 pParsed = treeAddFosterElement(pTree, eType, pAttr);
             } else {
                 /* Add this node to pCurrent. */
-                int nClose = 0;
-                int i;
+                Tcl_Size nClose = 0;
+                Tcl_Size i;
                 HtmlElementNode *pC;
                 int N;
 
@@ -1393,7 +1393,7 @@ HtmlTreeAddText(pTree, pTextNode, iOffset)
 
     if (pTree->state.isCdataInHead) {
         HtmlNode *pHeadNode = HtmlNodeChild(pTree->pRoot, 0);
-        int nChild = HtmlNodeNumChildren(pHeadNode) - 1;
+        Tcl_Size nChild = HtmlNodeNumChildren(pHeadNode) - 1;
         HtmlNode *pTitle = HtmlNodeChild(pHeadNode, nChild);
 
         HtmlNodeAddTextChild(pTitle, pTextNode);
@@ -1442,7 +1442,7 @@ HtmlTreeAddClosingTag(pTree, eTag, iOffset)
     int eTag;
     int iOffset;
 {
-    int nClose;
+    Tcl_Size nClose;
     int ii;
 
     HtmlInitTree(pTree);
@@ -1482,7 +1482,7 @@ walkTree(pTree, xCallback, pNode, clientData)
     HtmlNode *pNode;
     ClientData clientData;
 {
-    int i;
+    Tcl_Size i;
     if( pNode ){
         int rc = xCallback(pTree, pNode, clientData);
         switch (rc) {
@@ -1713,7 +1713,7 @@ HtmlNode *HtmlNodeRightSibling(pNode)
 {
     HtmlElementNode *pParent = (HtmlElementNode *)pNode->pParent;
     if( pParent ){
-        int i;
+        Tcl_Size i;
         for (i=0; i < pParent->nChild - 1; i++) {
             if (pNode == pParent->apChildren[i]) {
                 return pParent->apChildren[i+1];
@@ -1744,7 +1744,7 @@ HtmlNode *HtmlNodeLeftSibling(pNode)
 {
     HtmlElementNode *pParent = (HtmlElementNode *)pNode->pParent;
     if( pParent ){
-        int i;
+        Tcl_Size i;
         for (i = 1; i < pParent->nChild; i++) {
             if (pNode == pParent->apChildren[i]) {
                 return pParent->apChildren[i-1];
@@ -2126,7 +2126,7 @@ nodeTextCommand(interp, pNode, objc, objv)
 {
     HtmlTree *pTree = pNode->pNodeCmd->pTree;
     Tcl_Obj *pRet = 0;
-    int nByte = 0;
+    Tcl_Size nByte = 0;
 
     enum NODE_TEXT_enum {
         NODE_TEXT_GET,
@@ -2139,7 +2139,7 @@ nodeTextCommand(interp, pNode, objc, objv)
     static const struct NodeTextSubCommand {
         const char *zCommand;
         enum NODE_TEXT_enum eSymbol;
-        int nArg;
+        Tcl_Size nArg;
     } aSubCommand[] = {
         {"get",       NODE_TEXT_GET, 0},  
         {"-pre",      NODE_TEXT_PRE, 0},      
@@ -2207,7 +2207,7 @@ nodeTextCommand(interp, pNode, objc, objv)
 
         /* Modify the parent node or orphan table pointer */
         if( pNew->node.pParent ){
-            int i;
+            Tcl_Size i;
             HtmlElementNode *pParent = HtmlNodeAsElement(pNew->node.pParent);
             for (i=0; i < pParent->nChild; i++) {
                 if (pNode == pParent->apChildren[i]) {
@@ -2248,7 +2248,7 @@ nodeTextCommand(interp, pNode, objc, objv)
             HtmlTextIterNext(&sIter)
         ) {
             int eType = HtmlTextIterType(&sIter);
-            int nData = HtmlTextIterLength(&sIter);
+            Tcl_Size nData = HtmlTextIterLength(&sIter);
             char const * zData = HtmlTextIterData(&sIter);
     
             if (eChoice == NODE_TEXT_TOKENS) {
@@ -2330,7 +2330,7 @@ nodeTextCommand(interp, pNode, objc, objv)
  *
  *---------------------------------------------------------------------------
  */
-static int 
+static int
 nodeCommand(clientData, interp, objc, objv)
     ClientData clientData;
     Tcl_Interp *interp;
@@ -2454,7 +2454,7 @@ nodeCommand(clientData, interp, objc, objv)
             } else 
 
             if (!HtmlNodeIsText(pNode)) {
-                int i;
+                Tcl_Size i;
                 HtmlAttributes *pAttr = ((HtmlElementNode *)pNode)->pAttributes;
                 Tcl_Obj *p = Tcl_NewObj();
                 for (i = 0; pAttr && i < pAttr->nAttr; i++) {
@@ -2486,7 +2486,7 @@ node_attr_usage:
          */
         case NODE_CHILDREN: {
             if (objc == 2) {
-                int i;
+                Tcl_Size i;
                 Tcl_Obj *pRes = Tcl_NewObj();
                 for (i = 0; i < HtmlNodeNumChildren(pNode); i++) {
                     HtmlNode *pChild = HtmlNodeChild(pNode, i);
@@ -2557,7 +2557,7 @@ node_attr_usage:
          *     assigned to the parent node.
          */
         case NODE_PROPERTY: {
-            int nArg = objc - 2;
+            Tcl_Size nArg = objc - 2;
             Tcl_Obj * CONST *aArg = &objv[2];
 
             HtmlComputedValues *pComputed; 
@@ -2719,7 +2719,7 @@ node_attr_usage:
             const char *zArg1 = (objc>2) ? Tcl_GetString(objv[2]) : 0;
             const char *zArg2 = (objc>3) ? Tcl_GetString(objv[3]) : 0;
             Tcl_Obj *pRet;
-            int i;
+            Tcl_Size i;
             Html_u8 mask = 0;
 
             HtmlElementNode *pElem = (HtmlElementNode *)pNode;
@@ -2899,7 +2899,7 @@ HtmlNodeCommand(pTree, pNode)
     HtmlTree *pTree;
     HtmlNode *pNode;
 {
-    static int nodeNumber = 0;
+    static Tcl_Size nodeNumber = 0;
     HtmlNodeCmd *pNodeCmd = pNode->pNodeCmd;
 
     if (pNode->iNode == HTML_NODE_GENERATED) {
@@ -3111,7 +3111,7 @@ static void
 fragmentAddText(pTree, pTextNode, iOffset)
     HtmlTree *pTree;
     HtmlTextNode *pTextNode; 
-    int iOffset;
+    Tcl_Size iOffset;
 {
     HtmlFragmentContext *pFragment = pTree->pFragment;
 
@@ -3134,11 +3134,11 @@ fragmentAddElement(pTree, eType, pAttributes, iOffset)
     HtmlTree *pTree;
     int eType;
     HtmlAttributes *pAttributes; 
-    int iOffset;
+    Tcl_Size iOffset;
 {
     HtmlElementNode *pElem;
     HtmlFragmentContext *pFragment = pTree->pFragment;
-    int nClose;
+    Tcl_Size nClose;
     int ii;
 
     switch (eType) {
@@ -3189,9 +3189,9 @@ static void
 fragmentAddClosingTag(pTree, eType, iOffset)
     HtmlTree *pTree;
     int eType;
-    int iOffset;
+    Tcl_Size iOffset;
 {
-    int nClose;
+    Tcl_Size nClose;
     int ii;
     HtmlFragmentContext *p = pTree->pFragment;
     explicitCloseCount(p->pCurrent, eType, &nClose);

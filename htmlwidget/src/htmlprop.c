@@ -73,7 +73,7 @@ typedef struct PropertyDef PropertyDef;
 struct PropertyDef {
     enum PropertyValueType eType;
     int eProp;
-    int iOffset;
+    Tcl_Size iOffset;
     int mask;
     int iDefault;              /* For LENGTH and BORDERWIDTH */
 
@@ -370,7 +370,7 @@ HtmlPropertyToString(pProp, pzFree)
             pProp->eType == CSS_TYPE_URL ||
             pProp->eType == CSS_TYPE_ATTR
         ) {
-            int nBytes = strlen(pProp->v.zVal) + 7;
+            Tcl_Size nBytes = strlen(pProp->v.zVal) + 7;
             zRet = HtmlAlloc("HtmlPropertyToString()", nBytes);
             sprintf(zRet, "%s(%s)", 
                     (pProp->eType==CSS_TYPE_TCL)?"tcl":
@@ -500,7 +500,7 @@ propertyValuesSetFontStyle(p, pProp)
 {
     int eType = pProp->eType;
     if (eType == CSS_CONST_INHERIT) {
-        int i = HtmlNodeComputedValues(p->pParent)->fFont->pKey->isItalic;;
+        Tcl_Size i = HtmlNodeComputedValues(p->pParent)->fFont->pKey->isItalic;;
         p->fontKey.isItalic = i;
     }else if (eType == CSS_CONST_ITALIC || eType == CSS_CONST_OBLIQUE) {
         p->fontKey.isItalic = 1;
@@ -518,7 +518,7 @@ propertyValuesSetContent(p, pProp)
     CssProperty *pProp;
 {
     if (pProp->eType == CSS_TYPE_STRING && p->pzContent) {
-        int nBytes = strlen(pProp->v.zVal) + 1;
+        Tcl_Size nBytes = strlen(pProp->v.zVal) + 1;
         *(p->pzContent) = HtmlAlloc(
             "*HtmlComputedValuesCreator.pzContent", nBytes
         );
@@ -571,7 +571,7 @@ propertyValuesSetFontWeight(p, pProp)
     if (eType == CSS_CONST_INHERIT) {
         HtmlNode *pParent = p->pParent;
         if (pParent) {
-            int i = HtmlNodeComputedValues(pParent)->fFont->pKey->isBold;
+            Tcl_Size i = HtmlNodeComputedValues(pParent)->fFont->pKey->isBold;
             p->fontKey.isBold = i;
         }
     }
@@ -743,7 +743,7 @@ propertyValuesSetFontSize(p, pProp)
     if (pProp->eType == CSS_CONST_INHERIT) {
         HtmlNode *pParent = p->pParent;
         if (pParent) {
-            int i = HtmlNodeComputedValues(pParent)->fFont->pKey->iFontSize;
+            Tcl_Size i = HtmlNodeComputedValues(pParent)->fFont->pKey->iFontSize;
             p->fontKey.iFontSize = i;
         }
         return 0;
@@ -886,7 +886,7 @@ getInheritPointer(p, pVar)
     const int fontkey_end = fontkey_offset + sizeof(HtmlFontKey);
 #endif
 
-    int offset = pVar - (unsigned char *)p;
+    Tcl_Size offset = pVar - (unsigned char *)p;
     HtmlNode *pParent = p->pParent;
 
     assert(
@@ -1276,7 +1276,7 @@ propertyValuesSetLineHeight(p, pProp)
         }
         default: {
             /* Try to treat the property as a <length> */
-            int i = p->values.iLineHeight;
+            Tcl_Size i = p->values.iLineHeight;
             int *pIVal = &p->values.iLineHeight;
             rc = propertyValuesSetLength(p,pIVal,PROP_MASK_LINE_HEIGHT,pProp,0);
             if (*pIVal < 0) {
@@ -1633,7 +1633,7 @@ getPrototypeCreator(pTree, pMask, piCopyBytes)
         HtmlComputedValues *pValues;
         char *values;
     
-        int i;
+        Tcl_Size i;
 
         getPropertyDef(CSS_PROPERTY_VERTICAL_ALIGN);
 
@@ -1750,7 +1750,7 @@ HtmlComputedValuesInit(pTree, pNode, pParent, p)
      * properties of the parent node, if there is one.
      */
     if (pParent) {
-        int nBytes = sizeof(HtmlComputedValues) - iCopyBytes;
+        Tcl_Size nBytes = sizeof(HtmlComputedValues) - iCopyBytes;
         char *pvalues = (char *)((HtmlElementNode *)pParent)->pPropertyValues;
         HtmlComputedValues *pParentValues = (HtmlComputedValues *)pValues;
         memcpy(&values[iCopyBytes], &pvalues[iCopyBytes], nBytes);
@@ -1878,7 +1878,7 @@ propertyValuesAttr(p, eProp, zArglist)
     char *zCopy;
     const char *zCsr;
     const char *zEnd;
-    int n;
+    Tcl_Size n;
 
     char *zAttr = 0;
     char *zMod = 0;
@@ -2228,7 +2228,7 @@ HtmlComputedValuesFinish(p)
 #define OFFSET(x) offsetof(HtmlComputedValues, x)
     struct EmExMap {
         unsigned int mask;
-        int offset;
+        Tcl_Size offset;
     } emexmap[] = {
         {PROP_MASK_WIDTH,               OFFSET(iWidth)},
         {PROP_MASK_MIN_WIDTH,           OFFSET(iMinWidth)},
@@ -2970,7 +2970,7 @@ getPropertyObj(pValues, eProp)
             }
 
             case BORDERWIDTH: {
-                int iWidth = *(int *)(v + pDef->iOffset);
+                Tcl_Size iWidth = *(Tcl_Size *)(v + pDef->iOffset);
                 pValue = Tcl_NewIntObj(iWidth);
                 Tcl_AppendToObj(pValue, "px", -1);
                 break;

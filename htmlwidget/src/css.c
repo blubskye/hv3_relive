@@ -92,7 +92,7 @@ void *tkhtmlCssParserAlloc(void *(*)(size_t));
 void tkhtmlCssParser(void *, int, CssToken, CssParse*);
 void tkhtmlCssParserFree(void *, void (*)(void *));
 
-static int cssGetToken(CONST char *, int , int *);
+static int cssGetToken(CONST char *, Tcl_Size, Tcl_Size *);
 static int cssParse(HtmlTree*,int,CONST char*,int,int,Tcl_Obj*,Tcl_Obj*,Tcl_Obj*,CssStyleSheet**);
 
 /*
@@ -904,10 +904,10 @@ static int propertyIsLength(pProp)
 const char *
 HtmlCssGetNextListItem(zList, nList, pN)
     const char *zList;
-    int nList;
-    int *pN;
+    Tcl_Size nList;
+    Tcl_Size *pN;
 {
-    int n = 0;
+    Tcl_Size n = 0;
     int t = CT_SPACE;
     const char *zRet = 0;
     const char *z = zList;
@@ -924,7 +924,7 @@ HtmlCssGetNextListItem(zList, nList, pN)
     z += n;
 
     while (z<zEnd && t!=CT_SPACE && t > 0) {
-        int n2 = 0;
+        Tcl_Size n2 = 0;
         t = cssGetToken(z, zEnd-z, &n2);
         assert(n2>0);
         z += n2;
@@ -970,7 +970,7 @@ static void propertySetAddShortcutBorder(p, prop, v)
 {
     CONST char *z = v->z;
     CONST char *zEnd = z + v->n;
-    int n;
+    Tcl_Size n;
 
     int aWidth[] = {
         CSS_PROPERTY_BORDER_TOP_WIDTH,
@@ -992,7 +992,7 @@ static void propertySetAddShortcutBorder(p, prop, v)
     };
 
     int iOffset = 0;        /* Offset in aWidth[], aStyle[], aColor[] */
-    int nProp = 1;          /* Number of properties to set */
+    Tcl_Size nProp = 1;          /* Number of properties to set */
     switch (prop) {
         case CSS_SHORTCUTPROPERTY_BORDER:
             nProp = 4;
@@ -1135,7 +1135,7 @@ shortcutBackground(pParse, p, v)
 {
     CONST char *z= v->z;
     CONST char *zEnd = z + v->n;
-    int nProp = 0;
+    Tcl_Size nProp = 0;
     int ii;
 
     CssProperty *pColor = 0;
@@ -1147,7 +1147,7 @@ shortcutBackground(pParse, p, v)
 
     CssProperty *apProp[6];
     while (z && nProp<6) {
-        int n;
+        Tcl_Size n;
         z = HtmlCssGetNextListItem(z, zEnd-z, &n);
         if (z) {
             CssToken token;
@@ -1299,7 +1299,7 @@ shortcutListStyle(pParse, p, v)
     CssProperty *pProp = 0;
 
     while (z) {
-        int n;
+        Tcl_Size n;
         z = HtmlCssGetNextListItem(z, zEnd-z, &n);
         if (z) {
             pProp = textToProperty(pParse, z, n);
@@ -1384,7 +1384,7 @@ getNextFontFamily(zList, nList, pzNext)
 {
     CssToken token;
     int t;
-    int nToken = 0;
+    Tcl_Size nToken = 0;
     int nElem = 0;
     char *zRet;
 
@@ -1514,7 +1514,7 @@ propertySetAddShortcutFont(pParse, p, v)
 
     CssProperty *pProp = 0;
     while (z) {
-        int n;
+        Tcl_Size n;
         z = HtmlCssGetNextListItem(z, zEnd-z, &n);
         if (z) {
             pProp = textToProperty(0, z, n);
@@ -1630,11 +1630,11 @@ tokenToPropertyList(pToken, apProp, nMax)
 {
     CONST char *z= pToken->z;
     CONST char *zEnd = z + pToken->n;
-    int nProp = 0;
+    Tcl_Size nProp = 0;
     int ii;
 
     while (z) {
-        int nBytes;
+        Tcl_Size nBytes;
         z = HtmlCssGetNextListItem(z, zEnd-z, &nBytes);
         if (z) {
             CssToken token;
@@ -1678,7 +1678,7 @@ shortcutBackgroundPosition(pParse, p, v)
     CssPropertySet *p;         /* Property set */
     CssToken *v;               /* Value for 'background' property */
 {
-    int nProp;
+    Tcl_Size nProp;
     CssProperty *apProp[2];
 
     nProp = tokenToPropertyList(v, apProp, 2);
@@ -1772,7 +1772,7 @@ static void propertySetAddShortcutBorderColor(p, prop, v)
 {
     CONST char *z= v->z;
     CONST char *zEnd = z + v->n;
-    int n;
+    Tcl_Size n;
 
     int i = 0;                 /* Index of apProp to read next color in to */
     CssProperty *apProp[4];    /* Array of color properties */
@@ -1890,7 +1890,7 @@ static int
 cssGetToken(z, n, pLen)
     CONST char *z; 
     int n; 
-    int *pLen;
+    Tcl_Size *pLen;
 {
     if( n<=0 ){
       return 0;
@@ -2039,7 +2039,7 @@ parse_as_token:
             if( i==0 ) goto bad_token;
             if( i<n && z[i]=='(' ){
                 int t = -1;
-                int tlen;
+                Tcl_Size tlen;
                 i++;
                 while( i!=n && t!=0 && t!=CT_RRP ){
                     t = cssGetToken(&z[i], n-i, &tlen);
@@ -3210,7 +3210,7 @@ cssSelectorPropertySetPair(pParse, pSelector, pPropertySet, freeWhat)
  */
 int HtmlCssPseudo(pToken, nColon)
     CssToken *pToken;
-    int nColon;
+    Tcl_Size nColon;
 {
     struct PseudoString {
         const char *zOption;
@@ -3376,7 +3376,7 @@ static int attrTest(eType, zString, zAttr)
          */
         case CSS_SELECTOR_ATTRLISTVALUE: {
             const char *pAttr = zAttr;
-            int nAttr;
+            Tcl_Size nAttr;
             int nString = strlen(zString);
             while ((pAttr=HtmlCssGetNextListItem(pAttr, strlen(pAttr), &nAttr))) {
                 if (nString==nAttr && 0==strnicmp(pAttr, zString, nAttr)) {
@@ -3868,7 +3868,7 @@ HtmlCssStyleSheetApply(pTree, pNode)
     /* Find a rules list for each class the element belongs to */
     zClassAttr = HtmlNodeAttr(pNode, "class");
     if (zClassAttr) {
-        int nClass;
+        Tcl_Size nClass;
         char const *zClass = zClassAttr;
         char zTerm[MAX_CLASS_NAME];
 

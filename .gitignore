@@ -23,3 +23,13 @@ build-tkhtml/lemon
 # OS files
 .DS_Store
 Thumbs.db
+
+# Working documents and conversation exports
+TCLSIZE_FIX_PLAN.md
+porting_tcl9.txt
+chat*.txt
+build-tkhtml/chat*.txt
+
+# Test files
+test_*.tcl
+a.out

@@ -83,7 +83,7 @@ struct HtmlFontCache {
     Tcl_HashTable aHash;
     HtmlFont *pLruHead;
     HtmlFont *pLruTail;
-    int nZeroRef;
+    Tcl_Size nZeroRef;
 };
 
 /*

@@ -127,8 +127,8 @@ typedef struct BoxContext BoxContext;
 struct BoxContext {
     int iContaining;       /* DOWN: Width of containing block. */
     int iContainingHeight; /* DOWN: Height of containing block (may be AUTO). */
-    int height;            /* UP: Generated box height. */
-    int width;             /* UP: Generated box width. */
+    int height;            /* UP: Generated box height (pixels) */
+    int width;             /* UP: Generated box width (pixels) */
     HtmlCanvas vc;         /* UP: Canvas to draw the block on. */
 };
 

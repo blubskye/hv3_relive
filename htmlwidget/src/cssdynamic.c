@@ -82,8 +82,8 @@ HtmlCssCheckDynamic(pTree)
     if (pTree->cb.pDynamic) {
         HtmlNode *pParent = HtmlNodeParent(pTree->cb.pDynamic);
         if (pParent) {
-            int i;
-            int nChild = HtmlNodeNumChildren(pParent);
+            Tcl_Size i;
+            Tcl_Size nChild = HtmlNodeNumChildren(pParent);
             for (i = 0; HtmlNodeChild(pParent, i) != pTree->cb.pDynamic; i++);
             for ( ; i < nChild; i++) {
                 HtmlWalkTree(pTree,HtmlNodeChild(pParent,i),checkDynamicCb,0);

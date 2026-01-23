@@ -67,7 +67,7 @@ BINARIES	= $(lib_BINARIES) html.css
 
 SHELL		= /bin/sh
 
-srcdir		= ../htmlwidget
+srcdir = ../htmlwidget
 prefix		= /usr
 exec_prefix	= /usr
 
@@ -94,7 +94,7 @@ INSTALL_SCRIPT	= ${INSTALL}
 PACKAGE_NAME	= Tkhtml
 PACKAGE_VERSION	= 3.0
 CC		= gcc -pipe
-CFLAGS_DEFAULT	= -O2 -fomit-frame-pointer
+CFLAGS_DEFAULT	= -O0 -g
 CFLAGS_WARNING	= -Wall -Wno-implicit-int
 CLEANFILES	= pkgIndex.tcl
 EXEEXT		= 
