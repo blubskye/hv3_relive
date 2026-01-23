@@ -87,6 +87,25 @@ sudo apt install tcl-dev tk-dev libsqlite3-dev libssl-dev libgc-dev
 sudo pacman -S tcl tk sqlite openssl gc
 ```
 
+### 🎯 Runtime Requirements
+
+For running HV3 browser, you also need these Tcl packages:
+
+```bash
+# Fedora/RHEL
+sudo dnf install sqlite-tcl tkimg
+
+# Ubuntu/Debian
+sudo apt install tcl-sqlite3 libtk-img
+
+# Arch
+sudo pacman -S tcl-sqlite tk-img
+```
+
+**What these provide:**
+- **sqlite-tcl / tcl-sqlite3:** Tcl sqlite3 package for cookies, history, and bookmarks
+- **tkimg / libtk-img:** Img package for PNG, JPEG, and GIF image support
+
 ---
 
 ## 🚀 Building

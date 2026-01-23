@@ -405,11 +405,11 @@ EscHash(zName)
 static void
 EscHashStats(void)
 {
-    int i;
+    Tcl_Size i;
     int sum = 0;
     int max = 0;
-    int cnt;
-    int notempty = 0;
+    Tcl_Size cnt;
+    Tcl_Size notempty = 0;
     struct sgEsc *p;
 
     for (i = 0; i < sizeof(esc_sequences) / sizeof(esc_sequences[0]); i++) {
@@ -436,7 +436,7 @@ EscHashStats(void)
 static void
 EscInit()
 {
-    int i;                             /* For looping thru the list of escape 
+    Tcl_Size i;                             /* For looping thru the list of escape 
                                         * sequences */
     int h;                             /* The hash on a sequence */
 
@@ -622,7 +622,7 @@ HtmlTranslateEscapes(z)
     while (z[from]) {
         if (z[from] == '&') {
             if (z[from + 1] == '#') {
-                int i = from + 2;
+                Tcl_Size i = from + 2;
                 int v = translateNumericEscape(z, &i);
 
                 /*
@@ -642,7 +642,7 @@ HtmlTranslateEscapes(z)
                  */
 #ifdef TCL_UTF_MAX
                 {
-                    int j, n;
+                    Tcl_Size j, n;
                     char value[8];
                     n = Tcl_UniCharToUtf(v, value);
                     for (j = 0; j < n; j++) {
@@ -655,7 +655,7 @@ HtmlTranslateEscapes(z)
                 from = i;
             }
             else {
-                int i = from + 1;
+                Tcl_Size i = from + 1;
                 int c;
                 while (z[i] && isalnum(z[i])) {
                     i++;
@@ -669,7 +669,7 @@ HtmlTranslateEscapes(z)
                 }
                 z[i] = c;
                 if (p) {
-                    int j;
+                    Tcl_Size j;
                     for (j = 0; p->value[j]; j++) {
                         z[to++] = p->value[j];
                     }
@@ -772,8 +772,8 @@ orderIndexPair(ppA, piA, ppB, piB)
     HtmlNode *pA;
     HtmlNode *pB;
     HtmlNode *pParent;
-    int nDepthA = 0;
-    int nDepthB = 0;
+    Tcl_Size nDepthA = 0;
+    Tcl_Size nDepthB = 0;
     int ii;
 
     int swap = 0;
@@ -815,7 +815,7 @@ orderIndexPair(ppA, piA, ppB, piB)
 
     if (swap) {
         HtmlNode *p;
-        int i;
+        Tcl_Size i;
         p = *ppB;
         *ppB = *ppA;
         *ppA = p;
@@ -1171,7 +1171,7 @@ HtmlTagConfigureCmd(clientData, interp, objc, objv)
 
 struct TagDeleteContext {
     HtmlWidgetTag *pTag; 
-    int nOcc;
+    Tcl_Size nOcc;
 };
 typedef struct TagDeleteContext TagDeleteContext;
 
@@ -1318,7 +1318,7 @@ initHtmlText_TextNode(pTree, pTextNode, pInit)
         HtmlTextIterNext(&sIter)
     ) {
         int eType = HtmlTextIterType(&sIter);
-        int nData = HtmlTextIterLength(&sIter);
+        Tcl_Size nData = HtmlTextIterLength(&sIter);
         char const * zData = HtmlTextIterData(&sIter);
 
         switch (eType) {
@@ -1522,7 +1522,7 @@ HtmlTextIndexCmd(clientData, interp, objc, objv)
                 int iNodeIdx = pMap->iNodeIndex; 
                 Tcl_Obj *apObj[2];
 
-                int nExtra = iIndex - pMap->iStrIndex;
+                Tcl_Size nExtra = iIndex - pMap->iStrIndex;
                 char *zExtra = &(pMap->pTextNode->zText[iNodeIdx]);
                 iNodeIdx += (Tcl_UtfAtIndex(zExtra, nExtra) - zExtra);
 
@@ -1599,7 +1599,7 @@ HtmlTextOffsetCmd(clientData, interp, objc, objv)
     for (pMap = pTree->pText->pMapping; pMap; pMap = pMap->pNext) {
         if (pMap->pTextNode == pTextNode && pMap->iNodeIndex <= iIndex) {
             char *zExtra = &pTextNode->zText[pMap->iNodeIndex];
-            int nExtra = iIndex - pMap->iNodeIndex;
+            Tcl_Size nExtra = iIndex - pMap->iNodeIndex;
             iRet = pMap->iStrIndex + Tcl_NumUtfChars(zExtra, nExtra);
             break;
         }
@@ -1885,8 +1885,8 @@ populateTextNode(n, z, pText, pnToken, pnText)
     /* A running count of the number of tokens and bytes of text storage
      * required to store the parsed form of the input text.
      */
-    int nToken = 0;
-    int nText = 0;
+    Tcl_Size nToken = 0;
+    Tcl_Size nText = 0;
 
     /* This variable is used to expand tabs. */
     int iCol = 0;
@@ -1899,7 +1899,7 @@ populateTextNode(n, z, pText, pnToken, pnText)
 
         if (ISSPACE(c)) {
 
-            int nSpace = 0;                    /* Eventual token length */
+            Tcl_Size nSpace = 0;                    /* Eventual token length */
             int eType = HTML_TEXT_TOKEN_SPACE; /* Eventual token type */
 
             if (ISNEWLINE(c)) {
@@ -1960,7 +1960,7 @@ populateTextNode(n, z, pText, pnToken, pnText)
              * characters) in the token starting at zStart. zCsr is
              * left pointing to the byte immediately after the token.
              */
-            int nThisText = tokenLength(
+            Tcl_Size nThisText = tokenLength(
                 (unsigned char *)zCsr, (unsigned char *)zStop
             );
             assert(zCsr == zStart);
@@ -2014,9 +2014,9 @@ HtmlTextNew(n, z, isTrimEnd, isTrimStart)
     HtmlTextNode *pText;
     HtmlTextToken *pFinal;
 
-    int nText = 0;
-    int nToken = 0;
-    int nAlloc;                /* Number of bytes allocated */
+    Tcl_Size nText = 0;
+    Tcl_Size nToken = 0;
+    Tcl_Size nAlloc;                /* Number of bytes allocated */
 
     /* Make a temporary copy of the text and translate any embedded html 
      * escape characters (i.e. "&nbsp;"). Todo: Avoid this copy by changing

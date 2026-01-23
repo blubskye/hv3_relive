@@ -88,8 +88,8 @@ hashstatsCmd(clientData, interp, objc, objv)
     HtmlTree *pTree = (HtmlTree *)clientData;
     Tcl_HashEntry *p;
     Tcl_HashSearch search;
-    int nObj = 0;
-    int nRef = 0;
+    Tcl_Size nObj = 0;
+    Tcl_Size nRef = 0;
     char zRes[128];
 
     for (
@@ -160,7 +160,7 @@ logCommon(
         char *zDyn = 0;
         char zStack[200];
         char *zBuf = zStack;
-        int nBuf;
+        Tcl_Size nBuf;
         Tcl_Obj *pCmd;
 
         nBuf = vsnprintf(zBuf, 200, zFormat, ap);
@@ -421,8 +421,8 @@ INSTRUMENTED(runStyleEngine, HTML_INSTRUMENT_STYLE_ENGINE)
     assert(pRestyle);
 
     if (pParent) {
-        int i;
-        int nChild = HtmlNodeNumChildren(pParent);
+        Tcl_Size i;
+        Tcl_Size nChild = HtmlNodeNumChildren(pParent);
         assert(HtmlNodeComputedValues(pParent));
         for (i = 0; HtmlNodeChild(pParent, i) != pRestyle; i++);
         for ( ; i < nChild; i++) {
@@ -712,7 +712,7 @@ upgradeRestylePoint(ppRestyle, pNode)
                 return 1;
             }  
             if (HtmlNodeParent(pB) == pParentA) {
-                int i;
+                Tcl_Size i;
                 for (i = 0; i < HtmlNodeNumChildren(pParentA); i++) {
                     HtmlNode *pChild = HtmlNodeChild(pParentA, i);
                     if (pChild == pB || pChild == pA) {
@@ -1155,8 +1155,8 @@ eventHandler(clientData, pEvent)
     switch (pEvent->type) {
         case ConfigureNotify: {
             /* XConfigureEvent *p = (XConfigureEvent*)pEvent; */
-            int iWidth = Tk_Width(pTree->tkwin);
-            int iHeight = Tk_Height(pTree->tkwin);
+            Tcl_Size iWidth = Tk_Width(pTree->tkwin);
+            Tcl_Size iHeight = Tk_Height(pTree->tkwin);
             HtmlLog(pTree, "EVENT", "ConfigureNotify: width=%dpx", iWidth);
             if (
                 iWidth != pTree->iCanvasWidth || 
@@ -1705,7 +1705,7 @@ parseCmd(clientData, interp, objc, objv)
          * the [reset] method on this widget. The script-handler may then
          * go on to call [parse], which is the tricky bit...
          */
-        int nCount = 0;
+        Tcl_Size nCount = 0;
         while (pTree->eWriteState == HTML_WRITE_INHANDLERRESET && nCount<100) {
             assert(pTree->nParsed == 0);
             pTree->eWriteState = HTML_WRITE_NONE;
@@ -2412,7 +2412,7 @@ imageCmd(clientData, interp, objc, objv)
 {
     return HtmlLayoutImage(clientData, interp, objc, objv);
 }
-static int 
+static int
 nodeCmd(clientData, interp, objc, objv)
     ClientData clientData;             /* The HTML widget data structure */
     Tcl_Interp *interp;                /* Current interpreter. */
@@ -2592,7 +2592,7 @@ int widgetCmd(clientData, interp, objc, objv)
  *
  *---------------------------------------------------------------------------
  */
-static int 
+static int
 newWidget(clientData, interp, objc, objv)
     ClientData clientData;             /* The HTML widget data structure */
     Tcl_Interp *interp;                /* Current interpreter. */
@@ -2887,17 +2887,17 @@ DLL_EXPORT int Tkhtml_Init(interp)
 {
     int rc;
 
-    /* Require stubs libraries version 8.4 or greater. */
+    /* Require stubs libraries version 9 or greater (Tcl 9.x). */
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.4", 0) == 0) {
+    if (Tcl_InitStubs(interp, "9", 0) == 0) {
         return TCL_ERROR;
     }
-    if (Tk_InitStubs(interp, "8.4", 0) == 0) {
+    if (Tk_InitStubs(interp, "9", 0) == 0) {
         return TCL_ERROR;
     }
 #endif
 
-    if (0 == Tcl_PkgRequire(interp, "Tk", "8.4", 0)) {
+    if (0 == Tcl_PkgRequire(interp, "Tk", "9", 0)) {
         return TCL_ERROR;
     }
     Tcl_PkgProvide(interp, "Tkhtml", "3.0");

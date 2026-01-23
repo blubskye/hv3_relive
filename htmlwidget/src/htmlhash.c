@@ -135,7 +135,7 @@ allocCaseInsensitiveEntry(tablePtr, keyPtr)
 {
     CONST char *string = (CONST char *) keyPtr;
     Tcl_HashEntry *hPtr;
-    unsigned int size;
+    Tcl_Size size;
 
     size = sizeof(Tcl_HashEntry) + strlen(string) + 1 - sizeof(hPtr->key);
     if (size < sizeof(Tcl_HashEntry)) {
@@ -281,7 +281,7 @@ allocFontEntry(tablePtr, keyPtr)
     VOID *keyPtr;               /* Key to store in the hash table entry. */
 {
     HtmlFontKey *pKey = (HtmlFontKey *)keyPtr;
-    unsigned int size;
+    Tcl_Size size;
     Tcl_HashEntry *hPtr;
     HtmlFontKey *pStoredKey;
 
@@ -405,7 +405,7 @@ compareValuesKey(keyPtr, hPtr)
     unsigned char *p2 = (unsigned char *) hPtr->key.string;
 
     static const int N = offsetof(HtmlComputedValues, mask);
-    static const int nBytes =
+    static const Tcl_Size nBytes =
         sizeof(HtmlComputedValues) - offsetof(HtmlComputedValues, mask);
 
 
@@ -446,7 +446,7 @@ allocValuesEntry(tablePtr, keyPtr)
 {
     HtmlComputedValues *pKey = (HtmlComputedValues *)keyPtr;
     HtmlComputedValues *pStoredKey;
-    unsigned int size;
+    Tcl_Size size;
     Tcl_HashEntry *hPtr;
 
     size = (

@@ -77,6 +77,21 @@
 typedef int Tcl_Size;
 #define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #define Tcl_NewSizeIntObj Tcl_NewIntObj
+#define TCLSIZE_TO_INT(x) (x)
+#else
+/* Tcl 9.0+: Tcl_Size is 64-bit, but internal code uses 32-bit int.
+ * Safe conversion with bounds checking. */
+#include <limits.h>
+static inline Tcl_Size TCLSIZE_TO_INT(Tcl_Size size) {
+    if (size > INT_MAX) {
+        /* This should never happen in practice for HTML sizes */
+        return INT_MAX;
+    }
+    if (size < INT_MIN) {
+        return INT_MIN;
+    }
+    return (int)size;
+}
 #endif
 
 #include <string.h>
@@ -196,7 +211,7 @@ struct HtmlTokenMap {
 #define TAG_OK       3
 
 struct HtmlAttributes {
-    int nAttr;
+    Tcl_Size nAttr;
     struct HtmlAttribute {
         char *zName;
         char *zValue;
@@ -224,14 +239,14 @@ struct HtmlNodeReplacement {
     Tcl_Obj *pConfigureCmd;       /* Script passed to -configurecmd */
     Tcl_Obj *pStyleCmd;           /* Script passed to -stylecmd */
     Tcl_Obj *pDelete;             /* Script passed to -deletecmd */
-    int iOffset;                  /* See above */
+    int iOffset;                  /* Pixel offset for baseline alignment */
 
     /* Display related variables */
     int clipped;                  /* Boolean. If true, do not display */
     int iCanvasX;                 /* Current X canvas coordinate of window */
     int iCanvasY;                 /* Current Y canvas coordinate of window */
-    int iWidth;                   /* Current calculated pixel width of window*/
-    int iHeight;                  /* Current calculated pixel height of window*/
+    int iWidth;                   /* Pixel width - internal calc */
+    int iHeight;                  /* Pixel height - internal calc */
     HtmlNodeReplacement *pNext;   /* Next element in HtmlTree.pMapped list */
 };
 
@@ -356,7 +371,7 @@ struct HtmlElementNode {
     HtmlAttributes *pAttributes;      /* Html attributes associated with node */
 
     /* Children of this element node */
-    int nChild;                    /* Number of child nodes */
+    Tcl_Size nChild;                    /* Number of child nodes */
     HtmlNode **apChildren;         /* Array of pointers to children nodes */
 
     CssPropertySet *pStyle;                /* Parsed inline style */
@@ -563,8 +578,8 @@ struct HtmlTree {
      * are in characters, not bytes. TODO! See ticket #126.
      */
     Tcl_Obj *pDocument;             /* Text of the html document */
-    int nParsed;                    /* Bytes of pDocument tokenized */
-    int nCharParsed;                /* TODO: Characters parsed */
+    Tcl_Size nParsed;                    /* Bytes of pDocument tokenized */
+    Tcl_Size nCharParsed;                /* TODO: Characters parsed */
 
     int iWriteInsert;               /* Byte offset in pDocument for [write] */
     int eWriteState;                /* One of the HTML_WRITE_XXX values */
@@ -590,7 +605,7 @@ struct HtmlTree {
      */
     HtmlFragmentContext *pFragment;
 
-    int nFixedBackground;           /* Number of nodes with fixed backgrounds */
+    Tcl_Size nFixedBackground;           /* Number of nodes with fixed backgrounds */
 
     /*
      * Handler callbacks configured by the [$widget handler] command.
@@ -616,7 +631,7 @@ struct HtmlTree {
 
     /* Linked list of stacking contexts */
     HtmlNodeStack *pStack;
-    int nStack;                   /* Number of elements in linked list */
+    Tcl_Size nStack;                   /* Number of elements in linked list */
 
     /*
      * Internal representation of a completely layed-out document.
@@ -717,7 +732,7 @@ int HtmlStyleApply(HtmlTree *, HtmlNode *);
 int HtmlLayout(HtmlTree *);
 
 int HtmlStyleParse(HtmlTree*, Tcl_Interp*, Tcl_Obj*,Tcl_Obj*,Tcl_Obj*,Tcl_Obj*);
-void HtmlTokenizerAppend(HtmlTree *, const char *, int, int);
+void HtmlTokenizerAppend(HtmlTree *, const char *, Tcl_Size, int);
 int HtmlNameToType(void *, char *);
 Html_u8 HtmlMarkupFlags(int);
 
@@ -752,8 +767,8 @@ void HtmlDrawCleanup(HtmlTree *, HtmlCanvas *);
 void HtmlDrawDeleteControls(HtmlTree *, HtmlCanvas *);
 
 void HtmlDrawCanvas(HtmlCanvas*,HtmlCanvas*,int,int,HtmlNode*);
-void HtmlDrawText(HtmlCanvas*,const char*,int,int,int,int,int,HtmlNode*,int);
-void HtmlDrawTextExtend(HtmlCanvas*, int, int);
+void HtmlDrawText(HtmlCanvas*,const char*,Tcl_Size,int,int,int,int,HtmlNode*,int);
+void HtmlDrawTextExtend(HtmlCanvas*, Tcl_Size, Tcl_Size);
 int HtmlDrawTextLength(HtmlCanvas*);
 
 #define CANVAS_BOX_OPEN_LEFT    0x01      /* Open left-border */
@@ -797,13 +812,13 @@ char * HtmlMarkupArg(HtmlAttributes *, CONST char *, char *);
 void HtmlFloatListAdd(HtmlFloatList*, int, int, int, int);
 HtmlFloatList *HtmlFloatListNew();
 void HtmlFloatListDelete(HtmlFloatList*);
-int HtmlFloatListPlace(HtmlFloatList*, int, int, int, int);
+Tcl_Size HtmlFloatListPlace(HtmlFloatList*, int, Tcl_Size, Tcl_Size, int);
 int HtmlFloatListClear(HtmlFloatList*, int, int);
 int HtmlFloatListClearTop(HtmlFloatList*, int);
 void HtmlFloatListNormalize(HtmlFloatList*, int, int);
 void HtmlFloatListMargins(HtmlFloatList*, int, int, int *, int *);
 void HtmlFloatListLog(HtmlTree *, CONST char *, CONST char *, HtmlFloatList *);
-int HtmlFloatListIsConstant(HtmlFloatList*, int, int);
+int HtmlFloatListIsConstant(HtmlFloatList*, int, Tcl_Size);
 
 HtmlPropertyCache * HtmlNewPropertyCache();
 void HtmlSetPropertyCache(HtmlPropertyCache *, int, CssProperty *);
@@ -828,7 +843,7 @@ void HtmlImageFree(HtmlImage2 *);
 void HtmlImageRef(HtmlImage2 *);
 const char *HtmlImageUrl(HtmlImage2 *);
 void HtmlImageCheck(HtmlImage2 *);
-Tcl_Obj *HtmlXImageToImage(HtmlTree *, XImage *, int, int);
+Tcl_Obj *HtmlXImageToImage(HtmlTree *, XImage *, Tcl_Size, Tcl_Size);
 int HtmlImageAlphaChannel(HtmlTree *, HtmlImage2 *);
 
 void HtmlImageServerSuspendGC(HtmlTree *);

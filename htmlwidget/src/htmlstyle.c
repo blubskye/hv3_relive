@@ -254,11 +254,11 @@ stackCompare(pVoidLeft, pVoidRight)
     HtmlNodeStack *pRightStack = pRight->pStack;
     HtmlNodeStack *pParentStack = 0;
 
-    int nLeftDepth = -1;        /* Tree depth of node pLeftStack->pNode */
-    int nRightDepth = -1;       /* Tree depth of node pRightStack->pNode */
+    Tcl_Size nLeftDepth = -1;        /* Tree depth of node pLeftStack->pNode */
+    Tcl_Size nRightDepth = -1;       /* Tree depth of node pRightStack->pNode */
 
-    int iLeft;
-    int iRight;
+    Tcl_Size iLeft;
+    Tcl_Size iRight;
     int iRes;
     int iTreeOrder = 0;
 
@@ -378,7 +378,7 @@ static void
 checkStackSort(pTree, aStack, nStack)
     HtmlTree *pTree;
     StackCompare *aStack;
-    int nStack;
+    Tcl_Size nStack;
 {
 #if 0
     int ii;
@@ -641,7 +641,7 @@ HtmlStyleSyntaxErrs(clientData, interp, objc, objv)
     Tcl_Obj *CONST objv[];             /* List of all arguments */
 {
     HtmlTree *pTree = (HtmlTree *)clientData;
-    int nSyntaxErrs = 0;
+    Tcl_Size nSyntaxErrs = 0;
     if( pTree->pStyle ){
         nSyntaxErrs = HtmlCssStyleSheetSyntaxErrs(pTree->pStyle);
     }

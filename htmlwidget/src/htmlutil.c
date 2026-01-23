@@ -35,7 +35,7 @@ struct InstVector {
 };
 
 struct InstData {
-    int nCall;
+    Tcl_Size nCall;
     Tcl_WideInt iClicks;
 };
 

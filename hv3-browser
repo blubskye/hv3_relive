@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /home/blubskye/Downloads/tclkit9 /home/blubskye/Downloads/h3vmodern/hv3.kit "$@"

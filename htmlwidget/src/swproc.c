@@ -8,6 +8,7 @@
 #define CONST const
 #endif
 
+#include "html.h"
 #include "swproc.h"
 
 static const char rcsid[] = "$Id: swproc.c,v 1.6 2006/06/10 12:38:38 danielk1977 Exp $";
@@ -163,7 +164,7 @@ error_out:
  *
  *---------------------------------------------------------------------------
  */
-void 
+void
 SwprocCleanup(apObj, nObj)
     Tcl_Obj **apObj;
     int nObj;
@@ -257,7 +258,7 @@ swproc_rtCmd(clientData, interp, objc, objv)
                 Tcl_Size nArgs;
                 rc = Tcl_ListObjGetElements(interp, apObj[1], &nArgs, &apArgs);
                 if (rc == TCL_OK) {
-                    rc = SwprocRt(interp, nArgs, apArgs, aScriptConf, apVars);
+                    rc = SwprocRt(interp, TCLSIZE_TO_INT(nArgs), apArgs, aScriptConf, apVars);
                     if (rc == TCL_OK) {
                         for (ii = 0; ii < nConf; ii++) {
                             const char *zVar = aScriptConf[ii].zSwitch;

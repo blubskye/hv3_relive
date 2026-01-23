@@ -145,8 +145,8 @@ static int aResCounts[] = {0, 0, 0, 0, 0};
  */
 typedef struct ResRecord ResRecord;
 struct ResRecord {
-    int nRef;            /* Current number of outstanding references */
-    int nStack;          /* Number of stored stack-dumps */
+    Tcl_Size nRef;            /* Current number of outstanding references */
+    Tcl_Size nStack;          /* Number of stored stack-dumps */
     int **aStack;        /* Array of stored stack-dumps */
 };
 
@@ -181,7 +181,7 @@ ResAlloc(v1, v2)
 {
 #if defined(RES_DEBUG) && defined(__GLIBC__)
     int key[2];
-    int newentry;
+    Tcl_Size newentry;
     Tcl_HashEntry *pEntry;
     int *aFrame;
     ResRecord *pRec;
@@ -209,9 +209,9 @@ ResAlloc(v1, v2)
     aFrame[29] = 0;
     pRec->nRef++;
     pRec->nStack++;
-    pRec->aStack = (int **)ckrealloc(
+    pRec->aStack = (Tcl_Size **)ckrealloc(
             (char *)pRec->aStack, 
-            sizeof(int *) * pRec->nStack
+            sizeof(Tcl_Size *) * pRec->nStack
     );
     pRec->aStack[pRec->nStack - 1] = aFrame;
 #endif
@@ -256,7 +256,7 @@ ResFree(v1, v2)
     pRec->nRef--;
 
     if (pRec->nRef == 0) {
-        int i;
+        Tcl_Size i;
         ResRecord *pRec = (ResRecord *)Tcl_GetHashValue(pEntry);
 
         for (i = 0; i < pRec->nStack; i++) {
@@ -301,10 +301,10 @@ ResDump()
     ) {
         int *aKey = (int *)Tcl_GetHashKey(&aOutstanding, pEntry);
         ResRecord *pRec = (ResRecord *)Tcl_GetHashValue(pEntry);
-        int i;
+        Tcl_Size i;
         printf("RESOURCE %x %x ", aKey[0], aKey[1]);
         for (i = 0; i < pRec->nStack; i++) {
-            int j;
+            Tcl_Size j;
             printf("{");
             for (j = 0; pRec->aStack[i][j]; j++) {
                 printf("%x%s", pRec->aStack[i][j], pRec->aStack[i][j+1]?" ":"");
@@ -395,7 +395,7 @@ static void
 insertMallocHash(zTopic, p, nBytes) 
     const char *zTopic;    /* Topic for allocation */
     char *p;               /* Pointer just allocated by Rt_Alloc()/Realloc() */
-    int nBytes;            /* Number of bytes allocated at p */
+    Tcl_Size nBytes;            /* Number of bytes allocated at p */
 {
     int *aData;
     int isNewEntry;
@@ -440,7 +440,7 @@ insertMallocHash(zTopic, p, nBytes)
 static void
 freeMallocHash(p, nBytes) 
     char *p;              /* Pointer to remove from db */
-    int nBytes;           /* Number of bytes (previously) allocated at p */
+    Tcl_Size nBytes;           /* Number of bytes (previously) allocated at p */
 {
     int *aData;
     Tcl_HashEntry *pEntryAllocationType;
@@ -558,7 +558,7 @@ Rt_AllocCommand(clientData, interp, objc, objv)
   int objc;
   Tcl_Obj * const objv[];
 {
-    int i;
+    Tcl_Size i;
     Tcl_Obj *pRet;
 
     pRet = Tcl_NewObj();
@@ -593,7 +593,7 @@ Rt_Alloc(zTopic, n)
     const char *zTopic;
     int n;
 {
-    int nAlloc = n + 4 * sizeof(int);
+    Tcl_Size nAlloc = n + 4 * sizeof(int);
     int *z = (int *)ckalloc(nAlloc);
     char *zRet = (char *)&z[2];
     z[0] = 0xFED00FED;
