@@ -265,8 +265,8 @@ struct CanvasWindow {
     int x;                   /* Relative x coordinate */
     int y;                   /* Relative y coordinate */
     HtmlElementNode *pElem;  /* Node replaced by this window */
-    Tcl_Size iWidth;              /* CSS determined width of widget */
-    Tcl_Size iHeight;             /* CSS determined height of widget */
+    int iWidth;              /* Pixel width - internal calc */
+    int iHeight;             /* Pixel height - internal calc */
 };
 
 /*

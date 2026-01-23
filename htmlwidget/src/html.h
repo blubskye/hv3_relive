@@ -239,14 +239,14 @@ struct HtmlNodeReplacement {
     Tcl_Obj *pConfigureCmd;       /* Script passed to -configurecmd */
     Tcl_Obj *pStyleCmd;           /* Script passed to -stylecmd */
     Tcl_Obj *pDelete;             /* Script passed to -deletecmd */
-    Tcl_Size iOffset;                  /* See above */
+    int iOffset;                  /* Pixel offset for baseline alignment */
 
     /* Display related variables */
     int clipped;                  /* Boolean. If true, do not display */
     int iCanvasX;                 /* Current X canvas coordinate of window */
     int iCanvasY;                 /* Current Y canvas coordinate of window */
-    Tcl_Size iWidth;                   /* Current calculated pixel width of window*/
-    Tcl_Size iHeight;                  /* Current calculated pixel height of window*/
+    int iWidth;                   /* Pixel width - internal calc */
+    int iHeight;                  /* Pixel height - internal calc */
     HtmlNodeReplacement *pNext;   /* Next element in HtmlTree.pMapped list */
 };
 
@@ -292,8 +292,8 @@ struct HtmlNodeScrollbars {
     int iVertical;
     int iHorizontal;
 
-    Tcl_Size iHeight;               /* Height of viewport */
-    Tcl_Size iWidth;                /* Width of viewport */
+    int iHeight;               /* Height of viewport */
+    int iWidth;                /* Width of viewport */
     int iVerticalMax;          /* Height of scrollable area */
     int iHorizontalMax;        /* Width of scrollable area */
 };
@@ -427,8 +427,8 @@ struct HtmlCanvas {
 struct HtmlOptions {
 
     /* Tkhtml3 supports the following standard Tk options */
-    Tcl_Size      width;
-    Tcl_Size      height;
+    int      width;
+    int      height;
     int      xscrollincrement;
     int      yscrollincrement;
     Tcl_Obj *yscrollcommand;
@@ -843,7 +843,7 @@ void HtmlImageFree(HtmlImage2 *);
 void HtmlImageRef(HtmlImage2 *);
 const char *HtmlImageUrl(HtmlImage2 *);
 void HtmlImageCheck(HtmlImage2 *);
-Tcl_Obj *HtmlXImageToImage(HtmlTree *, XImage *, int, int);
+Tcl_Obj *HtmlXImageToImage(HtmlTree *, XImage *, Tcl_Size, Tcl_Size);
 int HtmlImageAlphaChannel(HtmlTree *, HtmlImage2 *);
 
 void HtmlImageServerSuspendGC(HtmlTree *);

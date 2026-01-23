@@ -45,10 +45,10 @@ typedef struct BoxProperties BoxProperties;
 typedef struct MarginProperties MarginProperties;
 
 struct BoxProperties {
-    Tcl_Size iTop;         /* Pixels of border + pixels of padding at top */
-    Tcl_Size iRight;       /* Pixels of border + pixels of padding at right */
-    Tcl_Size iBottom;      /* Pixels of border + pixels of padding at bottom */
-    Tcl_Size iLeft;        /* Pixels of border + pixels of padding at left */
+    int iTop;         /* Pixels of border + pixels of padding at top */
+    int iRight;       /* Pixels of border + pixels of padding at right */
+    int iBottom;      /* Pixels of border + pixels of padding at bottom */
+    int iLeft;        /* Pixels of border + pixels of padding at left */
 };
 
 struct MarginProperties {
@@ -80,7 +80,7 @@ void HtmlInlineContextCleanup(InlineContext *);
 void HtmlInlineContextAddText(InlineContext*, HtmlNode *);
 
 /* Add box (i.e. replaced) inline elements to the inline context */
-void HtmlInlineContextAddBox(InlineContext*,HtmlNode*,HtmlCanvas*,Tcl_Size,Tcl_Size,Tcl_Size);
+void HtmlInlineContextAddBox(InlineContext*,HtmlNode*,HtmlCanvas*,int,int,int);
 
 /* Test to see if the inline-context contains any more boxes */
 int HtmlInlineContextIsEmpty(InlineContext *);
@@ -127,8 +127,8 @@ typedef struct BoxContext BoxContext;
 struct BoxContext {
     int iContaining;       /* DOWN: Width of containing block. */
     int iContainingHeight; /* DOWN: Height of containing block (may be AUTO). */
-    Tcl_Size height;            /* UP: Generated box height. */
-    Tcl_Size width;             /* UP: Generated box width. */
+    int height;            /* UP: Generated box height (pixels) */
+    int width;             /* UP: Generated box width (pixels) */
     HtmlCanvas vc;         /* UP: Canvas to draw the block on. */
 };
 

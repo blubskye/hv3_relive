@@ -39,8 +39,28 @@
 static const char rcsid[] = "$Id: htmlimage.c,v 1.65 2007/09/25 11:21:42 danielk1977 Exp $";
 
 #include <assert.h>
+#include <limits.h>
 #include "html.h"
 #include "htmllayout.h"
+
+/*
+ * Safe allocation helpers to prevent integer overflow attacks
+ */
+#ifndef TCL_SIZE_MAX
+#define TCL_SIZE_MAX PTRDIFF_MAX
+#endif
+
+#define SAFE_MUL_CHECK(a, b, res) \
+    (((a) > 0 && (b) > 0 && (a) > TCL_SIZE_MAX / (b)) ? -1 : ((res) = (a) * (b), 0))
+
+static void* safe_HtmlAlloc(const char* tag, Tcl_Size size) {
+    if (size < 0 || size > (TCL_SIZE_MAX / 2)) {
+        fprintf(stderr, "Insane allocation request: %zd bytes for %s at %s:%d\n",
+                size, tag, __FILE__, __LINE__);
+        return NULL;
+    }
+    return HtmlAlloc(tag, size);
+}
 
 /*----------------------------------------------------------------------------
  * OVERVIEW 
@@ -621,12 +641,13 @@ HtmlImageImage(pImage)
         if (photo) {
             Tk_PhotoGetImage(photo, &block);
         }
-        if (photo && block.pixelPtr) { 
+        if (photo && block.pixelPtr) {
             int x, y;                /* Iterator variables */
-            int w, h;                /* Width and height of unscaled image */
-            int sw, sh;              /* Width and height of scaled image */
+            Tcl_Size w, h;           /* Width and height of unscaled image */
+            Tcl_Size sw, sh;         /* Width and height of scaled image */
             Tk_PhotoHandle s_photo;
             Tk_PhotoImageBlock s_block;
+            Tcl_Size pix_size;
 
             sw = pImage->width;
             sh = pImage->height;
@@ -634,7 +655,16 @@ HtmlImageImage(pImage)
             h = pUnscaled->height;
             s_photo = Tk_FindPhoto(interp, Tcl_GetString(pImage->pImageName));
 
-            s_block.pixelPtr = (unsigned char *)HtmlAlloc("temp", sw * sh * 4);
+            /* Check for integer overflow before allocation */
+            if (SAFE_MUL_CHECK(sw, sh, pix_size) || SAFE_MUL_CHECK(pix_size, 4, pix_size)) {
+                fprintf(stderr, "Integer overflow: scaled image size %zd x %zd\n", sw, sh);
+                return 0;  /* Return NULL Tk_Image on overflow */
+            }
+            s_block.pixelPtr = (unsigned char *)safe_HtmlAlloc("temp", pix_size);
+            if (!s_block.pixelPtr) {
+                fprintf(stderr, "Failed to allocate %zd bytes for scaled image\n", pix_size);
+                return 0;  /* Return NULL Tk_Image on allocation failure */
+            }
             s_block.width = sw;
             s_block.height = sh;
             s_block.pitch = sw * 4;
@@ -846,8 +876,8 @@ HtmlImageTile(pImage)
     Tcl_Obj *pTileName;             /* Name of tile image at the script level */
     Tk_PhotoHandle tilephoto;       /* Photo of tile */
     Tk_PhotoImageBlock tileblock;   /* Block of tile image */
-    int iTileWidth;
-    int iTileHeight;
+    Tcl_Size iTileWidth;
+    Tcl_Size iTileHeight;
 
     Tk_PhotoHandle origphoto;
     Tk_PhotoImageBlock origblock;
@@ -898,9 +928,18 @@ HtmlImageTile(pImage)
     iTileHeight = pImage->height * ymul;
 
     /* Allocate a block to write the tile data into. */
-    tileblock.pixelPtr = (unsigned char *)HtmlAlloc(
-        "temp", iTileWidth * iTileHeight * 4
-    );
+    {
+        Tcl_Size tile_size;
+        if (SAFE_MUL_CHECK(iTileWidth, iTileHeight, tile_size) || SAFE_MUL_CHECK(tile_size, 4, tile_size)) {
+            fprintf(stderr, "Integer overflow: tile size %zd x %zd\n", iTileWidth, iTileHeight);
+            return HtmlImageImage(pImage);  /* Fall back to non-tiled */
+        }
+        tileblock.pixelPtr = (unsigned char *)safe_HtmlAlloc("temp", tile_size);
+        if (!tileblock.pixelPtr) {
+            fprintf(stderr, "Failed to allocate %zd bytes for tile image\n", tile_size);
+            return HtmlImageImage(pImage);  /* Fall back to non-tiled */
+        }
+    }
     tileblock.width = iTileWidth;
     tileblock.height = iTileHeight;
     tileblock.pitch = iTileWidth * 4;
@@ -1046,8 +1085,8 @@ int HtmlImageServerCount(pTree)
 Tcl_Obj *HtmlXImageToImage(pTree, pXImage, w, h)
     HtmlTree *pTree;
     XImage *pXImage;
-    int w;
-    int h;
+    Tcl_Size w;
+    Tcl_Size h;
 {
     Tcl_Interp *interp = pTree->interp;
 
@@ -1060,12 +1099,24 @@ Tcl_Obj *HtmlXImageToImage(pTree, pXImage, w, h)
     unsigned long greenmask, greenshift;
     unsigned long bluemask, blueshift;
     Visual *pVisual;
+    Tcl_Size block_size;
 
     Tcl_Eval(interp, "image create photo");
     pImage = Tcl_GetObjResult(interp);
     Tcl_IncrRefCount(pImage);
 
-    block.pixelPtr = (unsigned char *)HtmlAlloc("temp", w * h * 4);
+    /* Check for integer overflow before allocation */
+    if (SAFE_MUL_CHECK(w, h, block_size) || SAFE_MUL_CHECK(block_size, 4, block_size)) {
+        fprintf(stderr, "Integer overflow: XImage size %zd x %zd\n", w, h);
+        Tcl_DecrRefCount(pImage);
+        return NULL;
+    }
+    block.pixelPtr = (unsigned char *)safe_HtmlAlloc("temp", block_size);
+    if (!block.pixelPtr) {
+        fprintf(stderr, "Failed to allocate %zd bytes for XImage conversion\n", block_size);
+        Tcl_DecrRefCount(pImage);
+        return NULL;
+    }
     block.width = w;
     block.height = h;
     block.pitch = w*4;

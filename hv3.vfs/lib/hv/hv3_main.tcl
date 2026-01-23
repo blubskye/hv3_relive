@@ -1281,9 +1281,11 @@ snit::type ::hv3::debug_menu {
 #         history_menu         The pulldown menu used for history
 #
 proc gui_build {widget_array} {
+  puts stderr "DEBUG: gui_build starting..."
   upvar $widget_array G
   global HTML
 
+  puts stderr "DEBUG: Creating toolbar..."
   # Create the top bit of the GUI - the URI entry and buttons.
   frame .toolbar
   frame .toolbar.b
@@ -1305,7 +1307,9 @@ proc gui_build {widget_array} {
 
   .toolbar.bug configure -tooltip "Bug Report"
 
+  puts stderr "DEBUG: Creating icon images..."
   catch {
+    puts stderr "DEBUG: Creating back icon..."
     set backimg [image create photo -data $::hv3::back_icon]
     .toolbar.b.back configure -image $backimg
     set forwardimg [image create photo -data $::hv3::forward_icon]
@@ -1373,12 +1377,14 @@ proc gui_build {widget_array} {
   pack .toolbar.bug -side right
   pack .toolbar.entry -fill x -expand true
 
-  # Pack the top, bottom and middle, in that order. The middle must be 
-  # packed last, as it is the bit we want to shrink if the size of the 
+  # Pack the top, bottom and middle, in that order. The middle must be
+  # packed last, as it is the bit we want to shrink if the size of the
   # main window is reduced.
-  pack .toolbar -fill x -side top 
+  puts stderr "DEBUG: Packing widgets..."
+  pack .toolbar -fill x -side top
   pack .status -fill x -side bottom
   pack .notebook -fill both -expand true
+  puts stderr "DEBUG: gui_build completed successfully"
 }
 
 proc goto_gui_location {browser entry args} {
@@ -1518,8 +1524,11 @@ proc gui_switch {new} {
 }
 
 proc gui_new {path args} {
+  puts stderr "DEBUG: gui_new called with path=$path args=$args"
   set new [::hv3::browser_toplevel $path]
+  puts stderr "DEBUG: browser_toplevel created"
   $::hv3::G(config) configurebrowser $new
+  puts stderr "DEBUG: browser configured"
 
   set var [$new titlevar]
   trace add variable $var write [list gui_settitle $new $var]
@@ -1528,9 +1537,13 @@ proc gui_new {path args} {
   trace add variable $var write [list gui_settitle $new $var]
 
   if {[llength $args] == 0} {
+    puts stderr "DEBUG: About to goto homeuri: $::hv3::homeuri"
     $new goto $::hv3::homeuri
+    puts stderr "DEBUG: goto homeuri completed"
   } else {
+    puts stderr "DEBUG: About to goto: [lindex $args 0]"
     $new goto [lindex $args 0]
+    puts stderr "DEBUG: goto completed"
   }
   
   # This black magic is required to initialise the history system.
@@ -1718,7 +1731,9 @@ proc main {args} {
     }
   }
 
+  puts stderr "DEBUG: Initializing database..."
   ::hv3::dbinit
+  puts stderr "DEBUG: Database initialized"
 
   if {[llength $docs] == 0} {set docs [list home://bookmarks/]}
   # set ::hv3::homeuri [lindex $docs 0]
@@ -1726,20 +1741,31 @@ proc main {args} {
 
   # Build the GUI
   gui_build     ::hv3::G
+  puts stderr "DEBUG: Calling gui_menu..."
   gui_menu      ::hv3::G
+  puts stderr "DEBUG: gui_menu completed"
 
+  puts stderr "DEBUG: Creating download manager..."
   ::hv3::downloadmanager ::hv3::the_download_manager
+  puts stderr "DEBUG: Download manager created"
 
   # After the event loop has run to create the GUI, run [main2]
   # to load the startup document. It's better if the GUI is created first,
   # because otherwise if an error occurs Tcl deems it to be fatal.
+  puts stderr "DEBUG: Scheduling main2 to load documents..."
   after idle [list main2 $docs]
+  puts stderr "DEBUG: main2 scheduled, entering vwait..."
 }
 proc main2 {docs} {
+  puts stderr "DEBUG: main2 called with docs: $docs"
   foreach doc $docs {
+    puts stderr "DEBUG: Loading document: $doc"
     set tab [$::hv3::G(notebook) add $doc]
+    puts stderr "DEBUG: Document loaded into tab"
   }
+  puts stderr "DEBUG: Focusing tab..."
   focus $tab
+  puts stderr "DEBUG: main2 completed - entering event loop"
 }
 proc ::hv3::usage {} {
   puts stderr "Usage:"

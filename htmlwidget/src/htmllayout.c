@@ -115,8 +115,8 @@ struct LayoutCache {
 
     /* Cached output values for normalFlowLayout() */
     NormalFlow normalFlowOut;
-    Tcl_Size iWidth;
-    Tcl_Size iHeight;
+    int iWidth;              /* Pixel width - internal calc */
+    int iHeight;             /* Pixel height - internal calc */
     HtmlCanvas canvas;
   
     /* If not PIXELVAL_AUTO, value for normal-flow callbacks */
@@ -167,11 +167,11 @@ static Tcl_Size nodeIsReplaced(HtmlNode *);
 
 
 typedef Tcl_Size (FlowLayoutFunc) (
-    LayoutContext *, 
-    BoxContext *, 
-    HtmlNode *, 
-    Tcl_Size *, 
-    InlineContext *, 
+    LayoutContext *,
+    BoxContext *,
+    HtmlNode *,
+    int *,              /* Y coordinate - internal pixel calc, not Tcl API */
+    InlineContext *,
     NormalFlow *
 );
 
@@ -501,7 +501,7 @@ considerMinMaxHeight(pNode, iContaining, piHeight)
     int iContaining;
     int *piHeight;
 {
-    Tcl_Size iHeight = *piHeight;
+    int iHeight = *piHeight;
     if (iHeight != PIXELVAL_AUTO) {
         HtmlComputedValues *pV = HtmlNodeComputedValues(pNode);
         int iMinHeight;
@@ -548,12 +548,12 @@ considerMinMaxHeight(pNode, iContaining, piHeight)
 int
 getHeight(pNode, iHeight, iContainingHeight)
     HtmlNode *pNode;             /* Node to determine height of */
-    Tcl_Size iHeight;                 /* Natural Content height */
+    int iHeight;                 /* Natural Content height */
     int iContainingHeight;       /* Containing height, or PIXELVAL_AUTO */
 {
     HtmlComputedValues *pV = HtmlNodeComputedValues(pNode);
 
-    Tcl_Size height = PIXELVAL(pV, HEIGHT, iContainingHeight);
+    int height = PIXELVAL(pV, HEIGHT, iContainingHeight);
     if (height == PIXELVAL_AUTO) {
         height = iHeight;
     }
@@ -590,7 +590,7 @@ considerMinMaxWidth(pNode, iContaining, piWidth)
     int iContaining;
     int *piWidth;
 {
-    Tcl_Size iWidth = *piWidth;
+    int iWidth = *piWidth;
     if (iWidth != PIXELVAL_AUTO) {
         HtmlComputedValues *pV = HtmlNodeComputedValues(pNode);
         int iMinWidth;
@@ -719,8 +719,8 @@ static void
 createScrollbars(pTree, pNode, iWidth, iHeight, iHorizontal, iVertical)
     HtmlTree *pTree;
     HtmlNode *pNode;
-    Tcl_Size iWidth;
-    Tcl_Size iHeight;
+    int iWidth;
+    int iHeight;
     int iHorizontal;
     int iVertical;
 {
@@ -834,8 +834,8 @@ normalFlowLayoutOverflow(pLayout, pBox, pNode, pY, pContext, pNormal)
     int iSpareWidth;
 
     int iComputedWidth;    /* Return value of getWidthProperty() */
-    Tcl_Size iWidth;            /* Content width of box */
-    Tcl_Size iHeight;           /* Content height of box */
+    int iWidth;            /* Content width of box */
+    int iHeight;           /* Content height of box */
 
     int useVertical = 0;   /* True to use a vertical scrollbar */
     int useHorizontal = 0; /* True to use a horizontal scrollbar */
@@ -1070,8 +1070,8 @@ normalFlowLayoutFloat(pLayout, pBox, pNode, pY, pDoNotUse, pNormal)
         BoxProperties box;   /* Box properties of pNode */
         BoxContext sContent;
         int c = pLayout->minmaxTest ? PIXELVAL_AUTO : iContaining;
-        Tcl_Size iWidth = PIXELVAL(pV, WIDTH, c);
-        Tcl_Size iHeight = PIXELVAL(pV, HEIGHT, pBox->iContainingHeight);
+        int iWidth = PIXELVAL(pV, WIDTH, c);
+        int iHeight = PIXELVAL(pV, HEIGHT, pBox->iContainingHeight);
         int isAuto = 0;
 
         nodeGetBoxProperties(pLayout, pNode, iContaining, &box);
@@ -1288,8 +1288,8 @@ markerBoxLayout(pLayout, pBox, pNode, pVerticalOffset)
 
     if (pComputed->imListStyleImage) {
         HtmlImage2 *pImg = pComputed->imListStyleImage;
-        Tcl_Size iWidth = PIXELVAL_AUTO;
-        Tcl_Size iHeight = PIXELVAL_AUTO;
+        int iWidth = PIXELVAL_AUTO;
+        int iHeight = PIXELVAL_AUTO;
         pImg = HtmlImageScale(pComputed->imListStyleImage, &iWidth, &iHeight,1);
         /* voffset = iHeight * -1; */
         HtmlDrawImage(
@@ -1411,6 +1411,8 @@ inlineLayoutDrawLines(pLayout, pBox, pContext, forceflag, pY, pNormal)
     NormalFlow *pNormal;
 {
     int have;
+    int loopCount = 0;             /* Safety counter to prevent infinite loops */
+    int lastY = *pY;               /* Track if Y is advancing */
     do {
         HtmlCanvas lc;             /* Line-Canvas */
         int w;
@@ -1420,8 +1422,15 @@ inlineLayoutDrawLines(pLayout, pBox, pContext, forceflag, pY, pNormal)
         int y = *pY;               /* Y coord for line-box baseline. */
         int leftFloat = 0;
         int rightFloat = pBox->iContaining;
-        Tcl_Size nV = 0;                /* Vertical height of line. */
-        Tcl_Size nA = 0;                /* Ascent of line box. */
+        int nV = 0;                /* Vertical height of line. */
+        int nA = 0;                /* Ascent of line box. */
+
+        /* Safety check: prevent infinite loops */
+        if (++loopCount > 10000 || (loopCount > 10 && y == lastY)) {
+            fprintf(stderr, "WARNING: Breaking infinite loop in inlineLayoutDrawLines (loopCount=%d, y=%d)\n", loopCount, y);
+            break;
+        }
+        lastY = y;
 
         /* If the inline-context is not completely empty, we collapse any
          * vertical margin here. Even though a line box may not be drawn by
@@ -1592,8 +1601,8 @@ drawReplacementContent(pLayout, pBox, pNode)
     BoxContext *pBox;
     HtmlNode *pNode;
 {
-    Tcl_Size iWidth;
-    Tcl_Size height;
+    int iWidth;
+    int height;
 
     HtmlComputedValues *pV= HtmlNodeComputedValues(pNode);
     HtmlElementNode *pElem = HtmlNodeAsElement(pNode);
@@ -1762,12 +1771,12 @@ drawAbsolute(pLayout, pBox, pStaticCanvas, x, y)
         HtmlComputedValues *pV= HtmlNodeComputedValues(pNode);
         int isReplaced = nodeIsReplaced(pList->pNode);
 
-        Tcl_Size iLeft   = PIXELVAL(pV, LEFT, pBox->iContaining);
-        Tcl_Size iRight  = PIXELVAL(pV, RIGHT, pBox->iContaining);
-        Tcl_Size iWidth  = PIXELVAL(pV, WIDTH, pBox->iContaining);
-        Tcl_Size iTop    = PIXELVAL(pV, TOP, iBoxHeight);
-        Tcl_Size iBottom = PIXELVAL(pV, BOTTOM, iBoxHeight);
-        Tcl_Size iHeight = PIXELVAL(pV, HEIGHT, iBoxHeight);
+        int iLeft   = PIXELVAL(pV, LEFT, pBox->iContaining);
+        int iRight  = PIXELVAL(pV, RIGHT, pBox->iContaining);
+        int iWidth  = PIXELVAL(pV, WIDTH, pBox->iContaining);
+        int iTop    = PIXELVAL(pV, TOP, iBoxHeight);
+        int iBottom = PIXELVAL(pV, BOTTOM, iBoxHeight);
+        int iHeight = PIXELVAL(pV, HEIGHT, iBoxHeight);
         int iSpace;
 
         pNext = pList->pNext;
@@ -2248,7 +2257,7 @@ normalFlowLayoutTable(pLayout, pBox, pNode, pY, pContext, pNormal)
     int iLeftFloat = 0;
     int iRightFloat = pBox->iContaining;
 
-    Tcl_Size iWidth;                        /* Specified content width */
+    int iWidth;                        /* Specified content width */
     int iCalcWidth;                    /* Calculated content width */
 
     int x, y;                     /* Coords for content to be drawn */
@@ -2551,7 +2560,7 @@ normalFlowLayoutBlock(pLayout, pBox, pNode, pY, pContext, pNormal)
     BoxProperties box;                /* Box properties of pNode */
     MarginProperties margin;          /* Margin properties of pNode */
     int iMPB;                         /* Sum of margins, padding borders */
-    Tcl_Size iWidth;                       /* Content width of pNode in pixels */
+    int iWidth;                       /* Content width of pNode in pixels */
     int iUsedWidth;
     int iWrappedX = 0;                /* X-offset of wrapped content */
     int iContHeight;                  /* Containing height for % 'height' val */
@@ -2795,7 +2804,7 @@ normalFlowLayoutReplacedInline(pLayout, pBox, pNode, pY, pContext, pNormal)
     BoxContext sBox;
     HtmlCanvas canvas;
     int w, h;
-    Tcl_Size iOffset;
+    int iOffset;             /* Pixel offset for alignment */
 
     MarginProperties margin;
     BoxProperties box;
@@ -2919,7 +2928,7 @@ normalFlowLayoutInlineBlock(pLayout, pBox, pNode, pY, pContext, pNormal)
     BoxContext sBox2;          /* After wrapContent() */
     BoxContext sBox3;          /* Adjusted for vertical margins */
 
-    Tcl_Size iWidth;                /* Calculated value of 'width' */
+    int iWidth;                /* Calculated value of 'width' */
     int iContaining;
     HtmlComputedValues *pV = HtmlNodeComputedValues(pNode);
 
@@ -3765,8 +3774,8 @@ doConfigureCmd(pTree, pElem, iContaining)
         Tcl_Obj *pScript;
         Tcl_Obj *pRes;
         int rc;
-        Tcl_Size iWidth;
-        Tcl_Size iHeight;
+        int iWidth;
+        int iHeight;
 
         pArray = Tcl_NewObj();
         Tcl_ListObjAppendElement(interp, pArray, Tcl_NewStringObj("color",-1));
