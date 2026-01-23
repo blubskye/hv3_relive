@@ -556,11 +556,11 @@ HtmlHash(htmlPtr, zName)
 static void
 HtmlHashStats(void * htmlPtr)
 {
-    int i;
+    Tcl_Size i;
     int sum = 0;
     int max = 0;
-    int cnt;
-    int notempty = 0;
+    Tcl_Size cnt;
+    Tcl_Size notempty = 0;
     struct sgMap *p;
 
     for (i = 0; i < HTML_MARKUP_COUNT; i++) {
@@ -590,7 +590,7 @@ HtmlHashInit(htmlPtr, start)
     void *htmlPtr;
     int start;
 {
-    int i;                             /* For looping thru the list of markup 
+    Tcl_Size i;                             /* For looping thru the list of markup 
                                         * names */
     int h;                             /* The hash on a markup name */
 
@@ -657,11 +657,11 @@ HtmlAttributesNew(argc, argv, arglen, doEscape)
     HtmlAttributes *pMarkup = 0;
 
     if (argc > 1) {
-        int nByte;
-        int j;
+        Tcl_Size nByte;
+        Tcl_Size j;
         char *zBuf;
 
-        int nAttr = argc / 2;
+        Tcl_Size nAttr = argc / 2;
 
         nByte = sizeof(HtmlAttributes);
         for (j = 0; j < argc; j++) {
@@ -674,7 +674,7 @@ HtmlAttributesNew(argc, argv, arglen, doEscape)
         zBuf = (char *)(&pMarkup->a[nAttr]);
 
         for (j=0; j < nAttr; j++) {
-            int idx = (j * 2);
+            Tcl_Size idx = (j * 2);
 
             pMarkup->a[j].zName = zBuf;
             memcpy(zBuf, argv[idx], arglen[idx]);
@@ -727,9 +727,9 @@ findEndOfScript(eTag, z, pN)
     int *pN;                  /* IN/OUT: Current index in z */
 {
     char zEnd[64];
-    int nEnd;
+    Tcl_Size nEnd;
     int ii;
-    int nLen = (strlen(&z[*pN]) + *pN);
+    Tcl_Size nLen = (strlen(&z[*pN]) + *pN);
 
     /* Figure out the string we are looking for as an end tag */
     sprintf(zEnd, "</%s", HtmlMarkupName(eTag));
@@ -740,7 +740,7 @@ findEndOfScript(eTag, z, pN)
             strnicmp(&z[ii], zEnd, nEnd) == 0 &&
             (z[ii+nEnd] == '>' || ISSPACE(z[ii+nEnd]))
         ) {
-            int nScript = ii - (*pN);
+            Tcl_Size nScript = ii - (*pN);
             ii += (nEnd + 1);
             *pN = ii;
             return nScript;
@@ -763,13 +763,13 @@ findEndOfScript(eTag, z, pN)
  *
  *---------------------------------------------------------------------------
  */
-static int 
+static Tcl_Size 
 executeScript(pTree, pCallback, pAttributes, zScript, nScript)
     HtmlTree *pTree;
     Tcl_Obj *pCallback;
     HtmlAttributes *pAttributes;
     const char *zScript;
-    int nScript;
+    Tcl_Size nScript;
 {
     Tcl_Obj *pAttr;
     Tcl_Obj *pEval;
@@ -840,7 +840,7 @@ HtmlTokenize(pTree, zText, isFinal, xAddText, xAddElement, xAddClosing)
     char *z;                     /* The input HTML text */
     int c;                       /* The next character of input */
     int n;                       /* Number of bytes processed so far */
-    int i, j;                    /* Loop counters */
+    Tcl_Size i, j;                    /* Loop counters */
     int argc;                    /* The number of arguments on a markup */
     HtmlTokenMap *pMap;          /* For searching the markup name hash table */
 # define mxARG 200               /* Max parameters in a single markup */
@@ -940,8 +940,8 @@ HtmlTokenize(pTree, zText, isFinal, xAddText, xAddElement, xAddClosing)
              */
             int isClosingTag = 0;
             int isSelfClosing = 0;
-            int i = 1;
-            int nStartScript = n;
+            Tcl_Size i = 1;
+            Tcl_Size nStartScript = n;
             argc = 1;
             argv[0] = &z[n + 1];
             assert( c=='<' );
@@ -1101,7 +1101,7 @@ HtmlTokenize(pTree, zText, isFinal, xAddText, xAddElement, xAddClosing)
             } else {
 
                 char *zScript = 0;
-                int nScript = 0;
+                Tcl_Size nScript = 0;
 
                 HtmlAttributes *pAttr;
                 Tcl_Obj *pScript = 0;
@@ -1266,7 +1266,7 @@ void
 HtmlTokenizerAppend(pTree, zText, nText, isFinal)
     HtmlTree *pTree;
     const char *zText;
-    int nText;
+    Tcl_Size nText;
     int isFinal;
 {
     /* TODO: Add a flag to prevent recursive calls to this routine. */
@@ -1384,7 +1384,7 @@ char * HtmlMarkupArg(pAttr, zTag, zDefault)
     const char *zTag;
     char *zDefault;
 {
-    int i;
+    Tcl_Size i;
     if (pAttr) {
         for (i = 0; i < pAttr->nAttr; i++) {
             if (strcmp(pAttr->a[i].zName, zTag) == 0) {

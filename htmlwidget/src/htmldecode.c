@@ -321,7 +321,7 @@ objToUri(pObj)
     while (ISALNUM(*zCsr) || *zCsr == '.') zCsr++;
     if (*zCsr == ':') {
         /* There is a scheme. */
-        int nScheme = zCsr - zInput;
+        Tcl_Size nScheme = zCsr - zInput;
         p->zScheme = zOut;
         memcpy(zOut, zInput, nScheme);
         zOut[nScheme] = '\0';
@@ -331,7 +331,7 @@ objToUri(pObj)
 
     /* If there is now a "//", then the next bit is the authority. */
     if (zInput[0] == '/' && zInput[1] == '/') {
-        int nAuthority;
+        Tcl_Size nAuthority;
         zInput = &zInput[2];
         zCsr = zInput;
         while (*zCsr && *zCsr != '/') zCsr++;
@@ -347,7 +347,7 @@ objToUri(pObj)
     zCsr = zInput;
     while (*zCsr && *zCsr != '?' && *zCsr != '#') zCsr++;
     if (zCsr != zInput) {
-        int nPath = zCsr - zInput;
+        Tcl_Size nPath = zCsr - zInput;
         memcpy(zOut, zInput, nPath);
         p->zPath = zOut;
         zOut[nPath] = '\0';
@@ -357,7 +357,7 @@ objToUri(pObj)
 
     /* The query */
     if (*zInput == '?') {
-        int nQuery;
+        Tcl_Size nQuery;
         zInput = &zInput[1];
         zCsr = zInput;
         while (*zCsr && *zCsr != '#') zCsr++;
@@ -371,7 +371,7 @@ objToUri(pObj)
 
     /* The fragment */
     if (*zInput == '#') {
-        int nFragment;
+        Tcl_Size nFragment;
         zInput = &zInput[1];
         zCsr = zInput;
         while (*zCsr) zCsr++;
@@ -393,17 +393,17 @@ combinePath(zOne, zTwo, zOut)
 {
     char *zRet;
     if (zTwo[0] == '/') {
-        int nSpace = strlen(zTwo) + 1;
+        Tcl_Size nSpace = strlen(zTwo) + 1;
         zRet = HtmlAlloc("tmp", nSpace);
         strcpy(zRet, zTwo);
     } else if (!zOne) {
-        int nSpace = strlen(zTwo) + 2;
+        Tcl_Size nSpace = strlen(zTwo) + 2;
         zRet = HtmlAlloc("tmp", nSpace);
         zRet[0] = '/';
         strcpy(&zRet[1], zTwo);
     } else {
-        int nSpace;
-        int nOne = 0;
+        Tcl_Size nSpace;
+        Tcl_Size nOne = 0;
         int ii = 0;
         while (zOne[ii]) {
             if (zOne[ii] == '/') {
@@ -424,7 +424,7 @@ static void
 cleanPath(zPath)
     char *zPath;
 {
-    int nPath = strlen(zPath);
+    Tcl_Size nPath = strlen(zPath);
     int iIn;
     int iOut = 0;
 
@@ -468,7 +468,7 @@ makeUri(zScheme, zAuthority, zPath, zQuery, zFragment)
     char const *zFragment;
 {
     char *zRes;
-    int nSpace = 
+    Tcl_Size nSpace = 
         (zScheme ? strlen(zScheme) + 1 : 0) +
         (zAuthority ? strlen(zAuthority) + 2 : 0) +
         (zPath ? strlen(zPath) + 2 : 0) +
@@ -593,7 +593,7 @@ uriObjCmd(clientData, interp, objc, objv)
     static const struct UriCommand {
         const char *zCommand;
         enum URI_enum eSymbol;
-        int nArg;
+        Tcl_Size nArg;
         const char *zUsage;
     } aSub[] = {
         {"resolve",   URI_RESOLVE,   1, "URI"},  

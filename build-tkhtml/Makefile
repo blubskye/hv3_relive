@@ -67,7 +67,7 @@ BINARIES	= $(lib_BINARIES) html.css
 
 SHELL		= /bin/sh
 
-srcdir		= ../htmlwidget
+srcdir = ../htmlwidget
 prefix		= /usr
 exec_prefix	= /usr
 

@@ -76,8 +76,8 @@ struct TableData {
      *
      *     tableCountCells()
      */
-    int nCol;                /* Total number of columns in table */
-    int nRow;                /* Total number of rows in table */
+    Tcl_Size nCol;                /* Total number of columns in table */
+    Tcl_Size nRow;                /* Total number of rows in table */
 
     /*
      * The following four arrays are populated by the two-pass algorithm
@@ -161,8 +161,8 @@ walkChildren(pTree, pNode, xCallback, pContext)
     int (*xCallback)(HtmlTree *, HtmlNode *, ClientData clientData);
     ClientData pContext;
 {
-    int i;
-    int nChild = HtmlNodeNumChildren(pNode);
+    Tcl_Size i;
+    Tcl_Size nChild = HtmlNodeNumChildren(pNode);
     for (i = 0; i < nChild; i++) {
         HtmlNode *pChild = HtmlNodeChild(pNode, i);
         xCallback(pTree, pChild, pContext);
@@ -493,9 +493,9 @@ tableColWidthMultiSpan(pNode, col, colspan, row, rowspan, pContext)
         int iTotalMax = 0;           /* Total max-width of all spanned cols */
         int iTotalPixel = 0;         /* Total pixel width of all spanned cols */
 
-        int nPixelWidth = 0;    /* Number of spanned pixel width cols */
-        int nPercentWidth = 0;  /* Number of spanned percent width cols */
-        int nAutoWidth = 0;     /* Number of spanned auto width cols */
+        Tcl_Size nPixelWidth = 0;    /* Number of spanned pixel width cols */
+        Tcl_Size nPercentWidth = 0;  /* Number of spanned percent width cols */
+        Tcl_Size nAutoWidth = 0;     /* Number of spanned auto width cols */
 
         int ii;
 
@@ -743,9 +743,9 @@ tableDrawRow(pNode, row, pContext)
 {
     TableData *pData = (TableData *)pContext;
     LayoutContext *pLayout = pData->pLayout;
-    int nextrow = row+1;
+    Tcl_Size nextrow = row+1;
     int x = 0;                             /* X coordinate to draw content */
-    int i;                                 /* Column iterator */
+    Tcl_Size i;                                 /* Column iterator */
     const int mmt = pLayout->minmaxTest;
 
     HtmlElementNode *pElem = (HtmlElementNode *)pNode;
@@ -763,7 +763,7 @@ tableDrawRow(pNode, row, pContext)
 
     CHECK_INTEGER_PLAUSIBILITY(pData->pBox->vc.bottom);
     if (pElem && pElem->node.iNode >= 0 && pElem->pPropertyValues) {
-        int iHeight;
+        Tcl_Size iHeight;
 
         int x1, y1, w1, h1;           /* Border coordinates */
         x1 = pData->border_spacing;
@@ -803,7 +803,7 @@ tableDrawRow(pNode, row, pContext)
             BoxProperties box;
             int x1, y1, w1, h1;           /* Border coordinates */
             int y;
-            int k;
+            Tcl_Size k;
 
             HtmlCanvas *pCanvas = &pData->pBox->vc;
 
@@ -899,12 +899,12 @@ tableDrawCells(pNode, col, colspan, row, rowspan, pContext)
     TableData *pData = (TableData *)pContext;
     BoxContext *pBox;
     BoxProperties box;
-    int i;
+    Tcl_Size i;
     int x = 0;
     int y = 0;
     int belowY;
     LayoutContext *pLayout = pData->pLayout;
-    int iHeight;
+    Tcl_Size iHeight;
     HtmlComputedValues *pV;
 
     fixNodeProperties(pData, pNode);
@@ -1010,7 +1010,7 @@ struct RowIterateContext {
      * that are children of a <tr>) if a table cell with a rowspan greater
      * than 1 is encountered, then aRowSpan[<col-number>] is set to
      * rowspan. */
-    int nRowSpan;
+    Tcl_Size nRowSpan;
     int *aRowSpan;
 
     int iMaxRow;        /* Index of the final row of table */
@@ -1026,8 +1026,8 @@ cellIterate(pTree, pNode, p)
     HtmlNode *pNode;
     RowIterateContext *p;
 {
-    int nSpan = 1;
-    int nRSpan = 1;
+    Tcl_Size nSpan = 1;
+    Tcl_Size nRSpan = 1;
     int col_ok = 0;
     char const *zSpan = 0;
 
@@ -1066,7 +1066,7 @@ cellIterate(pTree, pNode, p)
      * right until the above condition is false.
      */
     do {
-        int k;
+        Tcl_Size k;
         for (k = p->iCol; k < (p->iCol + nSpan); k++) {
             if (k < p->nRowSpan && p->aRowSpan[k]) break;
         }
@@ -1079,7 +1079,7 @@ cellIterate(pTree, pNode, p)
     
     /* Update the p->aRowSpan array. It grows here if required. */
     if (nRSpan!=1) {
-        int k;
+        Tcl_Size k;
         if (p->nRowSpan<(p->iCol+nSpan)) {
             int n = p->iCol+nSpan;
             p->aRowSpan = (int *)HtmlRealloc(0, (char *)p->aRowSpan, 
@@ -1108,7 +1108,7 @@ rowIterate(pTree, pNode, p)
     HtmlNode *pNode;
     RowIterateContext *p;
 {
-    int k;
+    Tcl_Size k;
     int ii;
 
     /* Either this is a synthetic node, or it's 'display' property
@@ -1352,9 +1352,9 @@ tableIterate(pTree, pNode, xCallback, xRowCallback, pContext)
 
 static void
 logWidthStage(nStage, pStageLog, nWidth, aWidth)
-    int nStage;
+    Tcl_Size nStage;
     Tcl_Obj *pStageLog;
-    int nWidth;
+    Tcl_Size nWidth;
     int *aWidth;
 {
     int ii;
@@ -1377,11 +1377,11 @@ tableCalculateCellWidths(pData, availablewidth, isAuto)
     /* The values of the following variables are set in the "analysis loop"
      * (the first loop below) and thereafter left unchanged.
      */ 
-    int nPercentCol = 0;         /* Number of percentage width columns */
+    Tcl_Size nPercentCol = 0;         /* Number of percentage width columns */
     double fTotalPercent = 0.0;  /* Total of percentage widths */
-    int nExplicitCol = 0;  /* Number of explicit pixel width columns */
+    Tcl_Size nExplicitCol = 0;  /* Number of explicit pixel width columns */
     int iMaxExplicit = 0;  /* Total of max-content-width for explicit cols */
-    int nAutoCol = 0;      /* Number of 'auto' width columns */
+    Tcl_Size nAutoCol = 0;      /* Number of 'auto' width columns */
     int iMaxAuto = 0;      /* Total of max-content-width for all 'auto' cols */
     int iMinAuto = 0;      /* Total of min-content-width for all 'auto' cols */
 
@@ -1754,8 +1754,8 @@ HtmlTableLayout(pLayout, pBox, pNode)
 {
     HtmlTree *pTree = pLayout->pTree;
     HtmlComputedValues *pV = HtmlNodeComputedValues(pNode);
-    int nCol = 0;             /* Number of columns in this table */
-    int i;
+    Tcl_Size nCol = 0;             /* Number of columns in this table */
+    Tcl_Size i;
     int availwidth;           /* Total width available for cells */
 
     int *aMinWidth = 0;       /* Minimum width for each column */
@@ -1809,7 +1809,7 @@ HtmlTableLayout(pLayout, pBox, pNode)
     aWidth         = (int *)HtmlClearAlloc(0, nCol*sizeof(int));
 
     aReqWidth = (CellReqWidth *)HtmlClearAlloc(0, nCol*sizeof(CellReqWidth));
-    aSingleReqWidth = 
+    aSingleReqWidth =
         (CellReqWidth *)HtmlClearAlloc(0, nCol*sizeof(CellReqWidth));
 
     aY = (int *)HtmlClearAlloc(0, (data.nRow+1)*sizeof(int));

@@ -28,8 +28,8 @@ static const char rcsid[] = "$Id: csssearch.c,v 1.5 2007/07/16 15:35:49 danielk1
 #define SEARCH_MODE_LENGTH  3
 
 struct CssCachedSearch {
-    int nAlloc;
-    int nNode;
+    Tcl_Size nAlloc;
+    Tcl_Size nNode;
     HtmlNode **apNode;
 };
 typedef struct CssCachedSearch CssCachedSearch;

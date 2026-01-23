@@ -243,7 +243,7 @@ void insertListEntry(pList, y)
              * split it into two parts. The margins are the same in each
              * part.
              */
-            int nBytes = sizeof(FloatListEntry);
+            Tcl_Size nBytes = sizeof(FloatListEntry);
             pNew = (FloatListEntry *)HtmlAlloc("FloatListEntry", nBytes);
             memcpy(pNew, pEntry, nBytes);
             pEntry->pNext = pNew;
@@ -676,12 +676,12 @@ HtmlFloatListMargins(pList, y1, y2, pLeft, pRight)
  *
  *---------------------------------------------------------------------------
  */
-int 
+Tcl_Size 
 HtmlFloatListPlace(pList, parentwidth, width, height, y)
     HtmlFloatList *pList;
     int parentwidth;
-    int width;
-    int height;
+    Tcl_Size width;
+    Tcl_Size height;
     int y;
 {
     int ret = y - pList->yorigin;
@@ -783,7 +783,7 @@ int
 HtmlFloatListIsConstant(pList, y, iHeight)
     HtmlFloatList *pList;
     int y;
-    int iHeight;
+    Tcl_Size iHeight;
 {
     int y1 = y - pList->yorigin;
     int y2 = y1 + iHeight;

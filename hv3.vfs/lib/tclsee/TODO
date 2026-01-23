@@ -1,0 +1,44 @@
+libgc:
+
+Follow. https://www.hboehm.info/gc/#where
+./configure --with-pic --enable-static
+make install
+
+SEE:
+
+https://www.adaptive-enterprises.com.au/~d/software/see/
+https://www.adaptive-enterprises.com.au/~d/software/see/see-3.1.1424.tar.gz
+
+./configure --with-pic
+make install
+
+- - -
+tclsee:
+
+make
+
+- - -
+Issues with hv3see.c
+
+hv3see.c:2048:
+
+SEE_interpreter_init_hostglobal() does not exist. No idea if our
+workaround is valid.
+
+hv3see.c:2108:
+
+When creating an interpreter we get an uncatchable exception.
+
+When we uncoment the SEE_error_throw, we get a TCL exception, but also
+an interpreter which seems to work.
+
+- - -
+tclsh8.6 [~/Projects/Software/tclsee] catch {see::interp ::x} y
+0
+tclsh8.6 [~/Projects/Software/tclsee] invalid command name "::x"
+    while executing
+"::x Events"
+
+tclsh8.6 [~/Projects/Software/tclsee] set y
+::see::interp_0
+- - -

@@ -92,7 +92,7 @@ HtmlMarkup(markup)
         };
         return &textmapentry;
     } else {
-        int i = markup-Html_A;
+        Tcl_Size i = markup-Html_A;
         assert(i>=0 && i<HTML_MARKUP_COUNT);
         return &HtmlMarkupMap[i];
     }
@@ -117,7 +117,7 @@ Html_u8
 HtmlMarkupFlags(markup)
     int markup;
 {
-    int i = markup-Html_A;
+    Tcl_Size i = markup-Html_A;
     if (i>=0 && i<HTML_MARKUP_COUNT){
         return HtmlMarkupMap[i].flags;
     }
@@ -147,7 +147,7 @@ CONST char *
 HtmlMarkupName(markup)
     int markup;
 {
-    int i = markup-Html_A;
+    Tcl_Size i = markup-Html_A;
     if (i>=0 && i<HTML_MARKUP_COUNT){
         return HtmlMarkupMap[i].zName;
     }

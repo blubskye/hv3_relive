@@ -133,15 +133,15 @@ struct InlineBorder {
  */
 struct InlineBox {
   HtmlCanvas canvas;          /* Canvas containing box content. */
-  int nSpace;                 /* Pixels of space between this and next box. */
+  Tcl_Size nSpace;                 /* Pixels of space between this and next box. */
   int eType;                  /* One of the INLINE_XXX values below */
 
   InlineBorder *pBorderStart; /* List of borders that start with this box */
   HtmlNode *pNode;            /* Associated tree node */
-  int nBorderEnd;             /* Number of borders that end here */
-  int nLeftPixels;            /* Total left width of borders that start here */
-  int nRightPixels;           /* Total right width of borders that start here */
-  int nContentPixels;         /* Width of content. */
+  Tcl_Size nBorderEnd;             /* Number of borders that end here */
+  Tcl_Size nLeftPixels;            /* Total left width of borders that start here */
+  Tcl_Size nRightPixels;           /* Total right width of borders that start here */
+  Tcl_Size nContentPixels;         /* Width of content. */
 
   /* Applicable value of the 'white-space' property */
   int eWhitespace;
@@ -163,8 +163,8 @@ struct InlineContext {
     int iTextIndent;        /* Pixels of 'text-indent' for next line */
     int ignoreLineHeight;   /* Boolean - true to ignore lineHeight */
 
-    int nInline;            /* Number of inline boxes in aInline */
-    int nInlineAlloc;       /* Number of slots allocated in aInline */
+    Tcl_Size nInline;            /* Number of inline boxes in aInline */
+    Tcl_Size nInlineAlloc;       /* Number of slots allocated in aInline */
     InlineBox *aInline;     /* Array of inline boxes. */
 
     int iVAlign;               /* Current vertical box offset */
@@ -204,7 +204,7 @@ if (pContext->pTree->options.logcmd && !pContext->isSizeOnly &&                \
 
 static void 
 oprintf(Tcl_Obj *pObj, CONST char *zFormat, ...) {
-    int nBuf = 0;
+    Tcl_Size nBuf = 0;
     char zBuf[1024];
     va_list ap;
     va_start(ap, zFormat);
@@ -545,7 +545,7 @@ inlineContextAddInlineCanvas(p, eType, pNode)
          * for which the canvas is returned is zeroed below.
          */
         char *a = (char *)p->aInline;
-        int nAlloc = p->nInlineAlloc + 25;
+        Tcl_Size nAlloc = p->nInlineAlloc + 25;
         p->aInline = (InlineBox *)HtmlRealloc(
             "InlineContext.aInline", a, nAlloc*sizeof(InlineBox)
         );
@@ -585,7 +585,7 @@ inlineContextAddInlineCanvas(p, eType, pNode)
 static void 
 inlineContextAddSpace(p, nPixels, eWhitespace)
     InlineContext *p; 
-    int nPixels;
+    Tcl_Size nPixels;
     int eWhitespace;
 {
     if (p->nInline > 0) {
@@ -614,7 +614,7 @@ inlineContextAddSpace(p, nPixels, eWhitespace)
 static void 
 inlineContextAddNewLine(p, nHeight)
     InlineContext *p; 
-    int nHeight;
+    Tcl_Size nHeight;
 {
     InlineBox *pBox;
     inlineContextAddInlineCanvas(p, INLINE_NEWLINE, 0);
@@ -661,10 +661,10 @@ pLayout, pCanvas, pBorder, x1, x2, iVerticalOffset, drb, aRepX, nRepX)
     int iVerticalOffset;      /* Vertical offset of logical box */
     int drb;                  /* Draw Right Border */
     int *aRepX;
-    int nRepX;
+    Tcl_Size nRepX;
 {
-    int iTop;
-    int iHeight;
+    Tcl_Size iTop;
+    Tcl_Size iHeight;
     int y_o;                  /* Y-coord for overline */
     int y_t;                  /* Y-coord for linethough */
     int y_u;                  /* Y-coord for underline */
@@ -716,7 +716,7 @@ pLayout, pCanvas, pBorder, x1, x2, iVerticalOffset, drb, aRepX, nRepX)
      */
     if (nRepX > 0) {
         int xa = x1;
-        int i;
+        Tcl_Size i;
         for (i = 0; i < nRepX; i++) {
             int xs = aRepX[i*2];         /* Start of replaced box $i */
             int xe = aRepX[i*2+1];       /* End of replaced box $i */
@@ -741,14 +741,14 @@ pLayout, pCanvas, pBorder, x1, x2, iVerticalOffset, drb, aRepX, nRepX)
 static void
 calculateLineBoxHeight(pContext, nBox, hasText, piTop, piBottom)
     InlineContext *pContext;
-    int nBox;
+    Tcl_Size nBox;
     int hasText;               /* True if line-box contains text */
     int *piTop;                /* OUT: Top of line box */
     int *piBottom;             /* OUT: Bottom of line box */
 {
     InlineBorder *p;
-    int iTop;
-    int iBottom;
+    Tcl_Size iTop;
+    Tcl_Size iBottom;
     int ii;
     int iVerticalOffset = 0;
     int doLineHeightQuirk = 0;
@@ -812,8 +812,8 @@ calculateLineBoxWidth(p, flags, iReqWidth, piWidth, pnBox, pHasText)
     int *pnBox;              /* OUT: Number of inline tokens in line box */
     int *pHasText;           /* OUT: True if there is a text or newline box */
 {
-    int nBox = 0;
-    int iWidth = 0;
+    Tcl_Size nBox = 0;
+    Tcl_Size iWidth = 0;
     int ii = 0;
     int hasText = 0;
 
@@ -967,15 +967,15 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
     int *pAscent;             /* OUT: Ascent of line box */
 {
     InlineContext * const pContext = p;  /* For the benefit of the LOG macros */
-    int i;                   /* Iterator variable for aInline */
-    int j;
+    Tcl_Size i;                   /* Iterator variable for aInline */
+    Tcl_Size j;
     int iLineWidth = 0;      /* Width of line-box in pixels */
-    int nBox = 0;            /* Number of inline boxes to draw */
+    Tcl_Size nBox = 0;            /* Number of inline boxes to draw */
     int x = 0;               /* Current x-coordinate */
     double nExtra = -10.0;   /* Extra justification pixels between each box */
     InlineBorder *pBorder;
     int *aReplacedX = 0;     /* List of x-coords - borders of replaced objs. */
-    int nReplacedX = 0;      /* Size of aReplacedX divided by 2 */
+    Tcl_Size nReplacedX = 0;      /* Size of aReplacedX divided by 2 */
 
     /* True if this line-box contains one or more INLINE_NEWLINE or
      * INLINE_TEXT elements. This is used to activate a line-box height quirk
@@ -990,9 +990,9 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
      * the root inline box (i.e. the one generated by the block element that
      * creates the inline context).
      */
-    int iTop;                /* Top of line-box. */
-    int iBottom;             /* Bottom of line-box. */
-    int iLeft = 0;           /* Leftmost pixel of line box */
+    Tcl_Size iTop;                /* Top of line-box. */
+    Tcl_Size iBottom;             /* Bottom of line-box. */
+    Tcl_Size iLeft = 0;           /* Leftmost pixel of line box */
 
     /* The amount of horizontal space available in which to stack boxes */
     const int iReqWidth = *pWidth - p->iTextIndent;
@@ -1059,7 +1059,7 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
         int boxwidth = pBox->nContentPixels;
         int x1;
         int x2;
-        int nBorderDraw = 0;
+        Tcl_Size nBorderDraw = 0;
 
         /* If the 'text-align' property is set to "justify", then we add a
          * few extra pixels between each inline box to justify the line.
@@ -1098,8 +1098,8 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
                 nExtra <= 0.0 && 
                 pFont->space_pixels == pBox[-1].nSpace
             ) {
-                int iWidth = pBox->canvas.right;
-                int nChar = HtmlDrawTextLength(&pBox->canvas) + 1;
+                Tcl_Size iWidth = pBox->canvas.right;
+                Tcl_Size nChar = HtmlDrawTextLength(&pBox->canvas) + 1;
                 HtmlDrawTextExtend(&content, nChar, pBox[-1].nSpace + iWidth);
                 HtmlDrawCleanup(pContext->pTree, &pBox->canvas);
             }
@@ -1148,7 +1148,7 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
          */
         x1 = x + extra_pixels + pBox->nLeftPixels;
         if (pBox->eType == INLINE_REPLACED) {
-            int nBytes;
+            Tcl_Size nBytes;
             nReplacedX++;
             nBytes = nReplacedX * 2 * sizeof(int);
             aReplacedX = (int *)HtmlRealloc("temp", (char *)aReplacedX, nBytes);
@@ -1182,7 +1182,7 @@ HtmlInlineContextGetLineBox(pLayout, p, flags, pWidth, pCanvas, pVSpace,pAscent)
             nBorderDraw = pBox->nBorderEnd;
         }
         for(j = 0; j < nBorderDraw; j++) {
-            int k;
+            Tcl_Size k;
             int rb;
             HtmlCanvas tmpcanvas;
             int iVerticalOffset = 0;
@@ -1471,7 +1471,7 @@ HtmlInlineContextAddText(pContext, pNode)
     int eWhitespace;               /* Value of 'white-space' property */
 
     int sw;                        /* Space-Width in pFont. */
-    int nh;                        /* Newline-height in pFont */
+    Tcl_Size nh;                        /* Newline-height in pFont */
     const int szonly = pContext->isSizeOnly;
 
     HtmlComputedValues *pValues;   /* Computed values (of parent node) */
@@ -1495,7 +1495,7 @@ HtmlInlineContextAddText(pContext, pNode)
         HtmlTextIterIsValid(&sIter);
         HtmlTextIterNext(&sIter)
     ) {
-        int nData = HtmlTextIterLength(&sIter);
+        Tcl_Size nData = HtmlTextIterLength(&sIter);
         char const *zData = HtmlTextIterData(&sIter);
         int eType = HtmlTextIterType(&sIter);
 
@@ -1529,7 +1529,7 @@ HtmlInlineContextAddText(pContext, pNode)
 
             case HTML_TEXT_TOKEN_NEWLINE:
                 if (eWhitespace == CSS_CONST_PRE) {
-                    int i;
+                    Tcl_Size i;
                     for (i = 0; i < nData; i++) {
                         inlineContextAddNewLine(pContext, nh);
                     }
@@ -1538,7 +1538,7 @@ HtmlInlineContextAddText(pContext, pNode)
                 /* Otherwise fall through */
 
             case HTML_TEXT_TOKEN_SPACE: {
-                int i;
+                Tcl_Size i;
                 if (
                     eWhitespace == CSS_CONST_PRE &&
                     HtmlInlineContextIsEmpty(pContext)
@@ -1585,9 +1585,9 @@ HtmlInlineContextAddBox(pContext, pNode, pCanvas, iWidth, iHeight, iOffset)
     InlineContext *pContext;
     HtmlNode * pNode;
     HtmlCanvas *pCanvas;
-    int iWidth;
-    int iHeight;
-    int iOffset;
+    Tcl_Size iWidth;
+    Tcl_Size iHeight;
+    Tcl_Size iOffset;
 {
     HtmlCanvas *pInline;
     InlineBorder *pBorder;

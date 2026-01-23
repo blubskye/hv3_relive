@@ -110,7 +110,7 @@ struct HtmlImage2 {
 
     int eAlpha;                      /* An ALPHA_CHANNEL_XXX value */
 
-    int nRef;                        /* Number of references to this struct */
+    Tcl_Size nRef;                        /* Number of references to this struct */
     Tcl_Obj *pImageName;             /* Image name, if this is unscaled */
     Tcl_Obj *pDelete;                /* Delete script, if this is unscaled */
     HtmlImage2 *pUnscaled;           /* Unscaled image, if this is scaled */
@@ -208,8 +208,8 @@ photoputblock(interp, handle, blockPtr, x, y, width, height, compRule)
     Tk_PhotoImageBlock *blockPtr;
     int x;
     int y;
-    int width;
-    int height;
+    Tcl_Size width;
+    Tcl_Size height;
     int compRule;
 {
     Tk_PhotoPutBlock(interp, handle, blockPtr, x, y, width, height, compRule);
@@ -284,8 +284,8 @@ imageChanged(clientData, x, y, width, height, imgWidth, imgHeight)
     ClientData clientData;
     int x;
     int y;
-    int width;
-    int height;
+    Tcl_Size width;
+    Tcl_Size height;
     int imgWidth;
     int imgHeight;
 {
@@ -961,7 +961,7 @@ void HtmlImageServerDoGC(pTree)
     HtmlTree *pTree;
 {
     if (pTree->pImageServer->isSuspendGC) {
-        int nDelete;
+        Tcl_Size nDelete;
         pTree->pImageServer->isSuspendGC = 0;
         do {
             int ii;
@@ -1007,7 +1007,7 @@ void HtmlImageServerDoGC(pTree)
 int HtmlImageServerCount(pTree)
     HtmlTree *pTree;
 {
-    int nImage = 0;
+    Tcl_Size nImage = 0;
     Tcl_HashSearch srch;
     Tcl_HashEntry *pEntry;
 
