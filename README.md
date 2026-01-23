@@ -214,11 +214,10 @@ tclsh hv3_main.tcl
 
 - **Tcl/Tk 9.0+** - Required
 - **Tkhtml3 package** - Built in `build-tkhtml/`
-- **Recommended packages** (install via instructions in System Requirements):
-  - `Img` - Image format support (PNG, JPEG, GIF) - **strongly recommended**
-  - `sqlite3` - Cookies, history, and bookmarks - **strongly recommended**
 - **Optional packages:**
-  - `Tclsee` - JavaScript support (built in `tclsee/tclsee0.1/`)
+  - `Img` - For additional image format support (PNG, JPEG, GIF)
+  - `sqlite3` - For cookies and history
+  - `Tclsee` - For JavaScript support
 
 ### ⚡ Optional: Start Polipo Proxy
 
