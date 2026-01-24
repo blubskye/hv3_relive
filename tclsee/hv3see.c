@@ -139,11 +139,6 @@
 #include <tcl.h>
 #include <see/see.h>
 
-/* Compatibility for Tcl 9.0+ where CONST was removed */
-#ifndef CONST
-#define CONST const
-#endif
-
 #ifdef NO_HAVE_GC
     /* If the symbol NO_HAVE_GC is defined, have SEE use regular malloc() 
      * instead of a garbage-collecting version. Of course, it leaks a
@@ -166,115 +161,22 @@
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 
-/* Unicode conversion helpers for Tcl 9.0 compatibility
- * SEE uses 16-bit chars (SEE_char_t = unsigned short)
- * Tcl 9.0 uses 32-bit chars (Tcl_UniChar = int)
- */
-static Tcl_UniChar *
-SEE_to_TclUnicode(const SEE_char_t *see_str, int length) {
-    Tcl_UniChar *tcl_str = (Tcl_UniChar *)ckalloc((length + 1) * sizeof(Tcl_UniChar));
-    int i;
-    for (i = 0; i < length; i++) {
-        tcl_str[i] = (Tcl_UniChar)see_str[i];
-    }
-    tcl_str[length] = 0;
-    return tcl_str;
-}
-
-static SEE_char_t *
-TclUnicode_to_SEE(const Tcl_UniChar *tcl_str, int length) {
-    SEE_char_t *see_str = (SEE_char_t *)ckalloc((length + 1) * sizeof(SEE_char_t));
-    int i;
-    for (i = 0; i < length; i++) {
-        see_str[i] = (SEE_char_t)tcl_str[i];
-    }
-    see_str[length] = 0;
-    return see_str;
-}
-
 /* File hv3format.c contains the code to uniformly indent javascript
  * text. This is used to make stuff in the debugger more readable, it
  * is not essential (and adds a fair overhead too).
  */
 #include "hv3format.c"
 
-#include "hv3bridge.c"
-
-typedef struct SeeTclObject SeeTclObject;
-typedef struct SeeTclClass SeeTclClass;
-
 typedef struct SeeInterp SeeInterp;
+typedef struct SeeTclObject SeeTclObject;
 typedef struct SeeJsObject SeeJsObject;
-typedef struct SeeTimeout SeeTimeout;
 
-typedef struct NodeHack NodeHack;
-struct NodeHack {
-  SeeTclObject *pObj;
-  NodeHack *pParent;             /* Parent of this node */
-  int iNode;                     /* Node index */
-};
+typedef struct SeeTimeout SeeTimeout;
 
 /* Size of hash-table. This should be replaced with a dynamic hash 
  * table structure. 
  */
 #define OBJECT_HASH_SIZE 257
-
-typedef struct EventType EventType;
-
-/* Each javascript object created by the Tcl-side is represented by
- * an instance of the following struct.
- */
-struct SeeTclObject {
-    struct SEE_object object;     /* C Base class - Object */
-    struct SEE_native *pNative;   /* Store native properties here */
-    Tcl_Obj *pObj;                /* Tcl script for object */
-
-    /* Used by the events sub-system (hv3events.c) */
-    EventType *pTypeList;
-    NodeHack *nodehandle;        /* Non-zero if this is a "node" object */
-
-    /* Used by the timer sub-system (hv3timeout.c). This pointer is only
-     * ever used for objects of type Window, but space is allocated for
-     * every single object. This seems a bit wasteful, but it's not our
-     * biggest problem right now.
-     */
-    SeeTimeout *pTimeout;
-
-    SeeTclClass *pClass;
-
-    /* The data stored in these variables is based on the data in pObj. 
-     * See the allocWordArray() function for details. The idea is that
-     * we break the list in pObj into an array of words (apWord). But
-     * the allocated size of apWord is larger than the number of
-     * words in pObj.
-     * 
-     * So when we need to append some arguments and execute the object
-     * command, the code just looks like this:
-     *
-     *     int N = pSeeTclObject->nWord;
-     *     pSeeTclObject->apWord[N]   = Tcl_NewStringObj(.....);
-     *     pSeeTclObject->apWord[N+1] = Tcl_NewStringObj(.....);
-     *     rc = Tcl_EvalObjv(interp, N+2, pSeeTclObject->apWord, flags);
-     *     # ... cleanup the two allocated string objects....
-     */
-    Tcl_Obj **apWord;
-    int nWord;
-    int nAllocWord;
-
-    /* This is used by objects while they reside in the 
-     * SeeInterp.aTclObject[] hash table. 
-     */
-    SeeTclObject *pNext;
-};
-
-struct SeeTclClass  {
-  /* Hash table containing fixed list of properties for this class. Hash
-   * table keys are intern'd SEE_string pointers. Because they are intern'd
-   * in the global string table, this can be used with any SEE interpreter.
-   */
-  Tcl_HashTable aProperty;
-};
-
 
 struct SeeInterp {
     /* The two interpreters - SEE and Tcl. The interp member must be
@@ -282,12 +184,7 @@ struct SeeInterp {
      * and (SeeInterp *).
      */
     struct SEE_interpreter interp;
-
-    /* The Tcl interpreter that created this object. */
     Tcl_Interp *pTclInterp;
-
-    /* The global object used by this interpreter. */
-    SeeTclObject global;
 
     ClientData pInstrumentData;
 
@@ -337,6 +234,50 @@ struct SeeInterp {
 };
 static int iSeeInterp = 0;
 
+typedef struct EventType EventType;
+
+/* Each javascript object created by the Tcl-side is represented by
+ * an instance of the following struct.
+ */
+struct SeeTclObject {
+    struct SEE_object object;     /* Base class - Object */
+    struct SEE_native *pNative;   /* Store native properties here */
+    Tcl_Obj *pObj;                /* Tcl script for object */
+
+    /* Used by the events sub-system (hv3events.c) */
+    EventType *pTypeList;
+
+    /* Used by the timer sub-system (hv3timeout.c). This pointer is only
+     * ever used for objects of type Window, but space is allocated for
+     * every single object. This seems a bit wasteful, but it's not our
+     * biggest problem right now.
+     */
+    SeeTimeout *pTimeout;
+
+    /* The data stored in these variables is based on the data in pObj. 
+     * See the allocWordArray() function for details. The idea is that
+     * we break the list in pObj into an array of words (apWord). But
+     * the allocated size of apWord is larger than the number of
+     * words in pObj.
+     * 
+     * So when we need to append some arguments and execute the object
+     * command, the code just looks like this:
+     *
+     *     int N = pSeeTclObject->nWord;
+     *     pSeeTclObject->apWord[N]   = Tcl_NewStringObj(.....);
+     *     pSeeTclObject->apWord[N+1] = Tcl_NewStringObj(.....);
+     *     rc = Tcl_EvalObjv(interp, N+2, pSeeTclObject->apWord, flags);
+     *     # ... cleanup the two allocated string objects....
+     */
+    Tcl_Obj **apWord;
+    int nWord;
+    int nAllocWord;
+
+    /* This is used by objects while they reside in the 
+     * SeeInterp.aTclObject[] hash table. 
+     */
+    SeeTclObject *pNext;
+};
 
 /* This variable, used for debugging, stores the total number of 
  * SeeTclObject structures currently allocated.
@@ -376,6 +317,9 @@ static struct SEE_objectclass *getVtbl();
 static void interpTimeoutInit(SeeInterp *, SeeTclObject *);
 static void interpTimeoutCleanup(SeeInterp *, SeeTclObject *);
 #include "hv3timeout.c"
+
+static void interpFunctionInit(SeeInterp *, SeeTclObject *);
+#include "hv3function.c"
 
 
 /*
@@ -525,7 +469,7 @@ createObjectRef(pTclSeeInterp, pObject)
 static void
 removeTransientRefs(pTclSeeInterp, n)
     SeeInterp *pTclSeeInterp;
-    Tcl_Size n;
+    int n;
 {
     int ii;
     for(ii = 0; ii < n; ii++) {
@@ -593,15 +537,18 @@ static Tcl_Obj *
 stringToObj(pString)
     struct SEE_string *pString;
 {
-    Tcl_Obj *pObj;
-    if( pString ){
-        Tcl_UniChar *tcl_str = SEE_to_TclUnicode(pString->data, pString->length);
-        pObj = Tcl_NewUnicodeObj(tcl_str, pString->length);
-        ckfree((char *)tcl_str);
-    } else {
-        pObj = Tcl_NewObj();
+    /* Convert SEE's 16-bit Unicode (SEE_char_t) to Tcl 9's 32-bit Unicode (Tcl_UniChar) */
+    Tcl_Size i;
+    Tcl_Size len = pString->length;
+    Tcl_UniChar *buf = (Tcl_UniChar *)Tcl_Alloc(len * sizeof(Tcl_UniChar));
+    Tcl_Obj *result;
+
+    for (i = 0; i < len; i++) {
+        buf[i] = (Tcl_UniChar)pString->data[i];
     }
-    return pObj;
+    result = Tcl_NewUnicodeObj(buf, len);
+    Tcl_Free((char *)buf);
+    return result;
 }
 
 /*
@@ -640,7 +587,7 @@ primitiveValueToTcl(pTclSeeInterp, pValue)
     if (
         eType != SEE_UNDEFINED && eType != SEE_NULL &&
         eType != SEE_BOOLEAN   && eType != SEE_NUMBER && 
-        eType != SEE_STRING    && eType != SEE_OBJECT
+        eType != SEE_STRING
     ) {
         SEE_ToPrimitive(&pTclSeeInterp->interp, pValue, 0, &copy);
         p = &copy;
@@ -671,16 +618,9 @@ primitiveValueToTcl(pTclSeeInterp, pValue)
             aTclValues[1] = stringToObj(p->u.string);
             break;
 
-        case SEE_OBJECT: {
-            if (p->u.object->objectclass != getVtbl()) {
-                aTclValues[0] = Tcl_NewStringObj("OBJECT", -1);
-            } else {
-                SeeTclObject *pObj = (SeeTclObject *)(p->u.object);
-                aTclValues[0] = Tcl_NewStringObj("object", -1);
-                aTclValues[1] = pObj->pObj;
-            }
+        case SEE_OBJECT: 
+            aTclValues[0] = Tcl_NewStringObj("OBJECT", -1);
             break;
-        }
 
         case SEE_REFERENCE: 
             aTclValues[0] = Tcl_NewStringObj("REFERENCE", -1);
@@ -843,7 +783,6 @@ callSeeTclMethod(pTcl, pLog, p, zMethod, pProperty, pVal)
         Tcl_ListObjAppendElement(0, pEval, p->pObj);
         if (pMethod) Tcl_ListObjAppendElement(0, pEval, pMethod);
         if (pProp) Tcl_ListObjAppendElement(0, pEval, pProp);
-        if (pVal) Tcl_ListObjAppendElement(0, pEval, pVal);
         Tcl_ListObjAppendElement(0, pEval, pRes);
         Tcl_EvalObjEx(pTcl, pEval, TCL_EVAL_DIRECT|TCL_EVAL_GLOBAL);
         Tcl_DecrRefCount(pEval);
@@ -856,35 +795,6 @@ callSeeTclMethod(pTcl, pLog, p, zMethod, pProperty, pVal)
     if (pProp) Tcl_DecrRefCount(pProp);
 
     return rc;
-}
-
-static void
-initSeeTclObject(pTclSeeInterp, p, pTclCommand)
-    SeeInterp *pTclSeeInterp;
-    SeeTclObject *p;
-    Tcl_Obj *pTclCommand;
-{
-    Tcl_CmdInfo info;
-    char zBuf[256];
-
-    memset(p, 0, sizeof(SeeTclObject));
-    p->pObj = pTclCommand;
-    p->object.objectclass = getVtbl();
-    p->object.Prototype = pTclSeeInterp->interp.Object_prototype;
-
-    Tcl_IncrRefCount(p->pObj);
-    allocWordArray(pTclSeeInterp, p, 5);
-
-    /* Initialise the native object (used to store native properties) */
-    p->pNative = (struct SEE_native *)SEE_native_new(&pTclSeeInterp->interp);
-
-    /* Initialise the class, if any */
-    sprintf(zBuf, "%s.class", Tcl_GetString(p->apWord[0]));
-    if (Tcl_GetCommandInfo(pTclSeeInterp->pTclInterp, zBuf, &info)){
-        p->pClass = (SeeTclClass *)info.objClientData;
-    }
-
-    iNumSeeTclObject++;
 }
 
 /*
@@ -908,8 +818,21 @@ newSeeTclObject(pTclSeeInterp, pTclCommand)
     SeeInterp *pTclSeeInterp;
     Tcl_Obj *pTclCommand;
 {
-    SeeTclObject *p = SEE_NEW(&pTclSeeInterp->interp, SeeTclObject);
-    initSeeTclObject(pTclSeeInterp, p, pTclCommand);
+    SeeTclObject *p;
+
+    p = SEE_NEW(&pTclSeeInterp->interp, SeeTclObject);
+    memset(p, 0, sizeof(SeeTclObject));
+    p->pObj = pTclCommand;
+    p->object.objectclass = getVtbl();
+    p->object.Prototype = pTclSeeInterp->interp.Object_prototype;
+
+    Tcl_IncrRefCount(p->pObj);
+    allocWordArray(pTclSeeInterp, p, 5);
+
+    /* Initialise the native object (used to store native properties) */
+    p->pNative = (struct SEE_native *)SEE_native_new(&pTclSeeInterp->interp);
+
+    iNumSeeTclObject++;
     return p;
 }
 
@@ -987,67 +910,6 @@ createTransient(pTclSeeInterp, pTclCommand)
 /*
  *---------------------------------------------------------------------------
  *
- * createNative --
- *
- * Results:
- *     Pointer to SEE_object structure.
- *
- * Side effects:
- *
- *---------------------------------------------------------------------------
- */
-static int objToValue(SeeInterp *, Tcl_Obj *, struct SEE_value *, int *);
-static struct SEE_object *
-createNative(pTclSeeInterp, pTclList)
-    SeeInterp *pTclSeeInterp;
-    Tcl_Obj *pTclList;
-{
-    Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
-    struct SEE_interpreter *pSee = (struct SEE_interpreter *)pTclSeeInterp;
-    Tcl_Size nElem = 0;
-    Tcl_Obj **apElem = 0;
-    int rc;
-    int ii;
-    struct SEE_object *pRet;
-
-    rc = Tcl_ListObjGetElements(pTcl, pTclList, &nElem, &apElem);
-    if (rc != TCL_OK) return 0;
-
-    pRet = (struct SEE_object *)SEE_native_new(pSee);
-    for (ii = 0; ii < (nElem-1); ii += 2){
-      struct SEE_value value;
-      rc = objToValue(pTclSeeInterp, apElem[ii+1], &value, 0);
-      if (rc != TCL_OK) return 0;
-      SEE_OBJECT_PUTA(pSee, pRet, Tcl_GetString(apElem[ii]), &value, 0);
-    }
-
-    return pRet;
-}
-
-static struct SEE_object *
-createBridge(pTclSeeInterp, pCommand)
-    SeeInterp *pTclSeeInterp;
-    Tcl_Obj *pCommand;
-{
-    Tcl_Command t;
-    Tcl_CmdInfo info;
-
-    SeeInterp *pForiegnInterp;
-
-    t = Tcl_GetCommandFromObj(pTclSeeInterp->pTclInterp, pCommand);
-    if( !t ) return 0;
-    assert(t);
-    Tcl_GetCommandInfoFromToken(t, &info);
-    pForiegnInterp = info.objClientData;
-    assert( pForiegnInterp->global.object.objectclass==getVtbl() );
-    return createBridgeObject(&pTclSeeInterp->interp, 
-        &pForiegnInterp->interp, &pForiegnInterp->global.object
-    );
-}
-
-/*
- *---------------------------------------------------------------------------
- *
  * findOrCreateObject --
  *
  * Results:
@@ -1093,11 +955,7 @@ findOrCreateObject(pTclSeeInterp, pTclCommand, isGlobal)
      */
     if (!pObject) {
         Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
-        if (isGlobal) {
-            pObject = &pTclSeeInterp->global;
-        }else{
-            pObject = newSeeTclObject(pTclSeeInterp, pTclCommand);
-        }
+        pObject = newSeeTclObject(pTclSeeInterp, pTclCommand);
 
         /* Insert the new object into the hash table */
         pObject->pNext = pTclSeeInterp->aTclObject[iSlot];
@@ -1116,28 +974,6 @@ findOrCreateObject(pTclSeeInterp, pTclCommand, isGlobal)
 
     return (struct SEE_object *)pObject;
 }
-
-static struct SEE_object *
-createNode(pTclSeeInterp, pTclCommand)
-    SeeInterp *pTclSeeInterp;
-    Tcl_Obj *pTclCommand;
-{
-    Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
-    SeeTclObject * p;
-
-    p = (SeeTclObject *)findOrCreateObject(pTclSeeInterp, pTclCommand, 0);
-    if (p->nodehandle == 0) {
-        Tcl_Command t;
-        Tcl_CmdInfo info;
-        t = Tcl_GetCommandFromObj(pTcl, p->apWord[2]);
-        assert(t);
-        Tcl_GetCommandInfoFromToken(t, &info);
-        p->nodehandle = info.objClientData;
-        ((NodeHack *)p->nodehandle)->pObj = p;
-    }
-    return (struct SEE_object *)p;
-}
-
 
 /*
  *---------------------------------------------------------------------------
@@ -1264,9 +1100,6 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
         } else {
             int iChoice;
             #define TRANSIENT -124
-            #define NATIVE    -123
-            #define NODE      -122
-            #define BRIDGE    -121
             struct ValueType {
                 char const *zType;
                 int eType;
@@ -1277,12 +1110,8 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
                 {"number",    SEE_NUMBER, 1}, 
                 {"string",    SEE_STRING, 1}, 
                 {"boolean",   SEE_BOOLEAN, 1},
-
                 {"object",    SEE_OBJECT, 1},
                 {"transient", TRANSIENT, 1},
-                {"native",    NATIVE, 1},
-                {"node",      NODE, 1},
-                {"bridge",    BRIDGE, 1},
                 {0, 0, 0}
             };
 
@@ -1337,18 +1166,25 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
                 case SEE_STRING: {
                     Tcl_Size nChar;
                     Tcl_UniChar *zChar;
-                    SEE_char_t *see_chars;
                     struct SEE_string *pString;
-                    struct SEE_string str;
+                    SEE_char_t *seeData;
+                    Tcl_Size i;
 
-                    zChar = Tcl_GetUnicodeFromObj(apElem[1], &nChar);;
-                    see_chars = TclUnicode_to_SEE(zChar, nChar);
+                    zChar = Tcl_GetUnicodeFromObj(apElem[1], &nChar);
 
+                    /* Convert 32-bit Tcl_UniChar to 16-bit SEE_char_t */
+                    seeData = (SEE_char_t *)SEE_malloc(
+                        &pInterp->interp, nChar * sizeof(SEE_char_t));
+                    for (i = 0; i < nChar; i++) {
+                        seeData[i] = (SEE_char_t)zChar[i];
+                    }
                     pString = SEE_string_new(&pInterp->interp, nChar);
-                    str.length = nChar;
-                    str.data = see_chars;
-                    SEE_string_append(pString, &str);
-                    ckfree((char *)see_chars);
+                    {
+                        struct SEE_string str;
+                        str.length = (unsigned int)nChar;
+                        str.data = seeData;
+                        SEE_string_append(pString, &str);
+                    }
 
                     SEE_SET_STRING(pValue, pString);
                     break;
@@ -1361,34 +1197,10 @@ objToValue(pInterp, pObj, pValue, pIsCacheable)
                     break;
                 }
 
-                case NODE: {
-                    struct SEE_object *p = createNode(pInterp, apElem[1]);
-                    SEE_SET_OBJECT(pValue, (struct SEE_object *)p);
-                    break;
-                }
-
                 case TRANSIENT: {
                     struct SEE_object *pObject = 
                         createTransient(pInterp, apElem[1]);
                     SEE_SET_OBJECT(pValue, pObject);
-                    break;
-                }
-
-                case NATIVE: {
-                    struct SEE_object *pObject;
-                    pObject = createNative(pInterp, apElem[1]);
-                    SEE_SET_OBJECT(pValue, pObject);
-                    break;
-                }
-
-                case BRIDGE: {
-                    struct SEE_object *pObject;
-                    pObject = createBridge(pInterp, apElem[1]);
-                    if (pObject) {
-                        SEE_SET_OBJECT(pValue, pObject);
-                    }else{
-                        rc = TCL_ERROR;
-                    }
                     break;
                 }
             }
@@ -1448,7 +1260,6 @@ handleJavascriptError(pTclSeeInterp, pTry)
     pError = Tcl_NewObj();
     Tcl_ListObjAppendElement(0, pError, Tcl_NewStringObj("JS_ERROR", -1));
 
-    /* String form of exception object thrown */
     SEE_ToString(pSeeInterp, SEE_CAUGHT(*pTry), &error);
     if (SEE_VALUE_GET_TYPE(&error) == SEE_STRING) {
         struct SEE_string *pS = error.u.string;
@@ -1458,21 +1269,12 @@ handleJavascriptError(pTclSeeInterp, pTry)
         Tcl_ListObjAppendElement(0, pError, Tcl_NewStringObj("N/A", -1));
     }
 
-    /* If there is a Tcl error, append it. Otherwise append an empty string. */
     if (pTclSeeInterp->pTclError) {
         Tcl_ListObjAppendElement(0, pError, pTclSeeInterp->pTclError);
         Tcl_DecrRefCount(pTclSeeInterp->pTclError);
         pTclSeeInterp->pTclError = 0;
     } else {
         Tcl_ListObjAppendElement(0, pError, Tcl_NewStringObj("", -1));
-    }
-
-    if (pSeeInterp->try_location) {
-        struct SEE_throw_location *pLoc = pSeeInterp->try_location;
-        Tcl_ListObjAppendElement(0, pError, stringToObj(pLoc->filename));
-        Tcl_ListObjAppendElement(0, pError, Tcl_NewIntObj(pLoc->lineno));
-        Tcl_ListObjAppendElement(0, pError, Tcl_NewObj());
-        Tcl_ListObjAppendElement(0, pError, Tcl_NewObj());
     }
 
     for (pTrace = pTry->traceback; pTrace; pTrace = pTrace->prev) {
@@ -1629,13 +1431,13 @@ interpEval(pTclSeeInterp, nArg, apArg)
 
     TclCmdArg aOptions[] = {
       {"-file",      0, 0},              /* 0 */
-      {"-noresult",  1, 0},              /* 1 */
+      {"-window",    0, 0},              /* 1 */
+      {"-noresult",  1, 0},              /* 2 */
       {0,            0, 0}
     };
-
     Tcl_Obj *pFile;                     /* Value passed to -file option */
+    Tcl_Obj *pWindow;                   /* Value passed to -window option */
     Tcl_Obj *pCode;                     /* Javascript to evaluate */
-    int isNoResult;                     /* True if -noresult */
 
     struct SEE_value res;               /* Result of script evaluation */
 
@@ -1648,7 +1450,7 @@ interpEval(pTclSeeInterp, nArg, apArg)
     }
     pCode = apArg[nArg - 1];
     pFile = aOptions[0].pVal;
-    isNoResult = (aOptions[1].pVal!=0);
+    pWindow = aOptions[1].pVal;
 
     memset(&res, 0, sizeof(struct SEE_value));
     Tcl_ResetResult(pTclInterp);
@@ -1658,16 +1460,21 @@ interpEval(pTclSeeInterp, nArg, apArg)
          * from within a trace callback. In this case use SEE_context_eval()
          */
         struct SEE_string input;
-        Tcl_UniChar *tcl_chars;
-        Tcl_Size tcl_len;
+        Tcl_Size codeLen;
+        Tcl_UniChar *codeChars;
+        Tcl_Size i;
+
         memset(&input, 0, sizeof(struct SEE_string));
-        tcl_chars = Tcl_GetUnicodeFromObj(pCode, &tcl_len);
-        input.data = TclUnicode_to_SEE(tcl_chars, tcl_len);
-        input.length = tcl_len;
+        codeChars = Tcl_GetUnicodeFromObj(pCode, &codeLen);
+        /* Convert 32-bit Tcl_UniChar to 16-bit SEE_char_t */
+        input.data = (SEE_char_t *)SEE_malloc(pSee, codeLen * sizeof(SEE_char_t));
+        for (i = 0; i < codeLen; i++) {
+            input.data[i] = (SEE_char_t)codeChars[i];
+        }
+        input.length = (unsigned int)codeLen;
         SEE_TRY(pSee, try_ctxt) {
             SEE_context_eval(pTclSeeInterp->pTraceContext, &input, &res);
         }
-        ckfree((char *)input.data);
     } else {
         struct SEE_input *pInput = SEE_input_utf8(pSee, Tcl_GetString(pCode));
 
@@ -1676,15 +1483,35 @@ interpEval(pTclSeeInterp, nArg, apArg)
                 pSee, "%s", Tcl_GetString(pFile)
             );
         }
-        SEE_TRY(pSee, try_ctxt) {
-            SEE_Global_eval(pSee, pInput, &res);
+
+        if (pWindow) {
+            struct SEE_object *p = 0;
+            struct SEE_scope *pScope = 0;
+            struct SEE_scope *pScopeOld = pTclSeeInterp->pScope;
+
+            p = findOrCreateObject(pTclSeeInterp, pWindow, 0);
+            pScope = (struct SEE_scope *)SEE_malloc(pSee, sizeof(*pScope) * 2);
+            pScope->obj = p;
+            pScope->next = &pScope[1];
+            pScope->next->obj = pTclSeeInterp->interp.Global;
+            pScope->next->next = 0;
+
+            pTclSeeInterp->pScope = pScope;
+            SEE_TRY(pSee, try_ctxt) {
+                SEE_eval(pSee, pInput, p, p, pScope, &res);
+            }
+            pTclSeeInterp->pScope = pScopeOld;
+        } else {
+            SEE_TRY(pSee, try_ctxt) {
+                SEE_Global_eval(pSee, pInput, &res);
+            }
         }
         SEE_INPUT_CLOSE(pInput);
     }
 
     if (SEE_CAUGHT(try_ctxt)) {
         rc = handleJavascriptError(pTclSeeInterp, &try_ctxt);
-    } else if (!isNoResult) {
+    } else if (!aOptions[2].pVal) {
         Tcl_SetObjResult(pTclInterp, primitiveValueToTcl(pTclSeeInterp, &res));
     }
 
@@ -1692,21 +1519,24 @@ interpEval(pTclSeeInterp, nArg, apArg)
 }
 
 static int
-interpGlobalSet(pTclSeeInterp, pProp, pValue)
-    SeeInterp *pTclSeeInterp;          /* Interpreter */
-    Tcl_Obj *pProp;
-    Tcl_Obj *pValue;
+interpClear(
+    SeeInterp *pTclSeeInterp,          /* Interpreter */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
-    struct SEE_value value;
-    int rc;
-    rc = objToValue(pTclSeeInterp, pValue, &value, 0);
-    if (rc == TCL_OK) {
-        SEE_OBJECT_PUTA(&pTclSeeInterp->interp, 
-            (struct SEE_object *)(pTclSeeInterp->global.pNative), 
-            Tcl_GetString(pProp), &value, 0
-        );
-    }
-    return rc;
+    struct SEE_object *pObj;
+    SeeTclObject *p;
+
+    pObj = findOrCreateObject(pTclSeeInterp,objv[2],0);
+    p = (SeeTclObject *)pObj;
+    interpTimeoutCleanup(pTclSeeInterp, p);
+    assert(p->pTimeout == 0);
+    memset(p->pNative->properties, 0, sizeof(p->pNative->properties));
+    p->pTypeList = 0;
+    interpTimeoutInit(pTclSeeInterp, p);
+    interpFunctionInit(pTclSeeInterp, p);
+
+    return TCL_OK;
 }
 
 /*
@@ -1730,10 +1560,10 @@ interpGlobalSet(pTclSeeInterp, pProp, pValue)
  *---------------------------------------------------------------------------
  */
 static int
-interpDebug(pTclSeeInterp, objc, objv)
-    SeeInterp *pTclSeeInterp;          /* Interpreter */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+interpDebug(
+    SeeInterp *pTclSeeInterp,          /* Interpreter */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     int iSlot;
     Tcl_Obj *pRet = Tcl_NewObj();
@@ -1796,12 +1626,12 @@ interpDebug(pTclSeeInterp, objc, objv)
  *
  *---------------------------------------------------------------------------
  */
-static int 
-interpCmd(clientData, pTclInterp, objc, objv)
-    ClientData clientData;             /* The SeeInterp data structure */
-    Tcl_Interp *pTclInterp;            /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+static int
+interpCmd(
+    ClientData clientData,             /* The SeeInterp data structure */
+    Tcl_Interp *pTclInterp,            /* Current interpreter. */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     int rc = TCL_OK;
     int iChoice;
@@ -1815,9 +1645,8 @@ interpCmd(clientData, pTclInterp, objc, objv)
         INTERP_DESTROY,               /* Destroy the interpreter */
         INTERP_EVAL,                  /* Evaluate some javascript */
         INTERP_TOSTRING,              /* Convert js value to a string */
-
-        INTERP_NODE,
-        INTERP_GLOBAL,
+        INTERP_WINDOW,                /* Initialize a "Window" object */
+        INTERP_CLEAR,
 
         /* Object management */
         INTERP_MAKE_TRANSIENT,        /* Declare an object eligible for GC */
@@ -1843,11 +1672,8 @@ interpCmd(clientData, pTclInterp, objc, objv)
         {"destroy",     INTERP_DESTROY,     0, 0, ""},
         {"eval",        INTERP_EVAL,        0, -1, 0},
         {"tostring",    INTERP_TOSTRING,    1, 1, "JAVASCRIPT-VALUE"},
-
-        {"node",        INTERP_NODE,        1, 1, "TCL-COMMAND"},
-
-        /* Set properties on persistent objects */
-        {"global",      INTERP_GLOBAL,      2, 2, "PROPERTY JAVASCRIPT-VALUE"},
+        {"window",      INTERP_WINDOW,      1, 1, "JAVASCRIPT-VALUE"},
+        {"clear",       INTERP_CLEAR,       1, 1, "JAVASCRIPT-VALUE"},
 
         /* Events */
         {"dispatch",    INTERP_DISPATCH, 2, 2, "TARGET-COMMAND EVENT-COMMAND"},
@@ -1902,18 +1728,20 @@ interpCmd(clientData, pTclInterp, objc, objv)
         }
 
         /*
-         * seeInterp node JAVASCRIPT-OBJECT
+         * seeInterp window JAVASCRIPT-OBJECT
          */
-        case INTERP_NODE: {
-            createNode(pTclSeeInterp, objv[2]);
+        case INTERP_WINDOW: {
+            struct SEE_object *p = findOrCreateObject(pTclSeeInterp,objv[2],0);
+            interpTimeoutInit(pTclSeeInterp, (SeeTclObject *)p);
+            interpFunctionInit(pTclSeeInterp, (SeeTclObject *)p);
             break;
         }
 
         /*
-         * seeInterp global PROPERTY JAVASCRIPT-VALUE
+         * seeInterp clear JAVASCRIPT-OBJECT
          */
-        case INTERP_GLOBAL: {
-            rc = interpGlobalSet(pTclSeeInterp, objv[2], objv[3]);
+        case INTERP_CLEAR: {
+            rc = interpClear(pTclSeeInterp, objc, objv);
             break;
         }
 
@@ -2066,48 +1894,29 @@ seeTraceHook(pSeeInterp, pThrowLoc, pContext, event)
  *
  *---------------------------------------------------------------------------
  */
-static int 
-tclSeeInterp(clientData, interp, objc, objv)
-    ClientData clientData;             /* Unused */
-    Tcl_Interp *interp;                /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+static int
+tclSeeInterp(
+    ClientData clientData,             /* Unused */
+    Tcl_Interp *interp,                /* Current interpreter. */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     char zCmd[64];
     SeeInterp *pInterp;
-    if (objc != 2) {
-        Tcl_WrongNumArgs(interp, 1, objv, "GLOBAL-OBJCOMMAND");
-        return TCL_ERROR;
-    }
 
-    /* Allocate the interpreter structure and initialize the global object. */
+    sprintf(zCmd, "::see::interp_%d", iSeeInterp++);
+
     pInterp = (SeeInterp *)GC_MALLOC_UNCOLLECTABLE(sizeof(SeeInterp));
     memset(pInterp, 0, sizeof(SeeInterp));
-    pInterp->pTclInterp = interp;
-    initSeeTclObject(pInterp, &pInterp->global, objv[1]);
  
-    /* Initialize the SEE interpreter. */
-    /* SEE_interpreter_init_hostglobal(&pInterp->interp,  */
-    /*     SEE_COMPAT_JS15|SEE_COMPAT_SGMLCOM|SEE_COMPAT_262_3B, */
-    /* 	(struct SEE_object *)&pInterp->global */
-    /* ); */
-    // TODO: The above fails on see-3.1.1424,
-    //   just trying....
+    /* Initialize a new SEE interpreter */
     SEE_interpreter_init_compat(&pInterp->interp, 
-        SEE_COMPAT_JS15|SEE_COMPAT_SGMLCOM|SEE_COMPAT_262_3B);
+        SEE_COMPAT_JS15|SEE_COMPAT_SGMLCOM|SEE_COMPAT_262_3B
+    );
     pInterp->interp.trace = seeTraceHook;
 
-    /* This call puts the global object in the hash table with the other
-     * Tcl based objects. This is required so that references to 'window'
-     * actually return a pointer to SEE_interpreter.Global.
-     */
-    findOrCreateObject(pInterp, objv[1], 1);
-    interpTimeoutInit(pInterp, &pInterp->global);
-
-    /* Create the tcl command used to access this javascript interpreter. */
-    sprintf(zCmd, "::see::interp_%d", iSeeInterp++);
-    Tcl_CreateObjCommand(interp, zCmd, interpCmd, pInterp, delInterpCmd);
-    Tcl_SetResult(interp, zCmd, TCL_VOLATILE);
+    /* Initialise the pTclInterp field. */
+    pInterp->pTclInterp = interp;
 
 #ifndef NDEBUG
     if (1) {
@@ -2118,6 +1927,8 @@ tclSeeInterp(clientData, interp, objc, objv)
     }
 #endif
 
+    Tcl_CreateObjCommand(interp, zCmd, interpCmd, pInterp, delInterpCmd);
+    Tcl_SetResult(interp, zCmd, TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -2146,8 +1957,7 @@ static void throwTclError(p, rc)
         Tcl_DecrRefCount(pErrorInfo);
 
         Tcl_SetObjResult(interp, pSaved);
-	// TODO: we barfed here.. lets... ... wind it up
-	// SEE_error_throw(p, p->Error, "%s", Tcl_GetStringResult(interp));
+        SEE_error_throw(p, p->Error, "%s", Tcl_GetStringResult(interp));
     }
 }
 
@@ -2181,7 +1991,7 @@ tclCallOrConstruct(zMethod, pInterp, pObj, pThis, argc, argv, pRes)
     struct SEE_object *pThis;
     int argc;
     struct SEE_value **argv;
-    struct SEE_value *pRes;
+    struct SEE_string *pRes;
 {
     SeeTclObject *p = (SeeTclObject *)pObj;
     SeeInterp *pTclSeeInterp = (SeeInterp *)pInterp;
@@ -2246,20 +2056,16 @@ SeeTcl_Get(pInterp, pObj, pProp, pRes)
      *
      *     eval $obj Get $property
      */
-    if (!p->pClass || Tcl_FindHashEntry(&p->pClass->aProperty, (char *)pProp)) {
-        rc = callSeeTclMethod(pTclInterp, pTclSeeInterp->pLog, p,"Get",pProp,0);
-        throwTclError(pInterp, rc);
-        pScriptRes = Tcl_GetObjResult(pTclInterp);
-        Tcl_IncrRefCount(pScriptRes);
-        rc = objToValue(pTclSeeInterp, pScriptRes, pRes, &isCacheable);
-        Tcl_DecrRefCount(pScriptRes);
-        throwTclError(pInterp, rc);
-    
-        if (isCacheable) {
-            SEE_native_put(pInterp, pNative, pProp, pRes, SEE_ATTR_INTERNAL);
-        }
-    } else {
-        SEE_SET_UNDEFINED(pRes);
+    rc = callSeeTclMethod(pTclInterp, pTclSeeInterp->pLog, p, "Get", pProp, 0);
+    throwTclError(pInterp, rc);
+    pScriptRes = Tcl_GetObjResult(pTclInterp);
+    Tcl_IncrRefCount(pScriptRes);
+    rc = objToValue(pTclSeeInterp, pScriptRes, pRes, &isCacheable);
+    Tcl_DecrRefCount(pScriptRes);
+    throwTclError(pInterp, rc);
+
+    if (isCacheable) {
+        SEE_native_put(pInterp, pNative, pProp, pRes, SEE_ATTR_INTERNAL);
     }
 }
 
@@ -2282,7 +2088,6 @@ SeeTcl_Put(pInterp, pObj, pProp, pValue, flags)
     Tcl_Obj *pVal;
     int nObj = 0;
 
-    pProp = SEE_intern(pInterp, pProp);
     isNative = SEE_OBJECT_HASPROPERTY(pInterp, pNative, pProp);
 
     if (!isNative) {
@@ -2331,23 +2136,18 @@ SeeTcl_HasProperty(pInterp, pObj, pProp)
     struct SEE_object *pObj;
     struct SEE_string *pProp;
 {
-    SeeTclObject *p = (SeeTclObject *)pObj;
+    SeeTclObject *pObject = (SeeTclObject *)pObj;
     SeeInterp *pTclSeeInterp = (SeeInterp *)pInterp;
     int rc;
     int ret = 0;
-    struct SEE_object *pNative = (struct SEE_object *)p->pNative;
-
-    if (p == &pTclSeeInterp->global) return 1;
+    struct SEE_object *pNative = (struct SEE_object *)pObject->pNative;
 
     /* First check if the property is stored in the native hash table. */
-    pProp = SEE_intern(pInterp, pProp);
     ret = SEE_OBJECT_HASPROPERTY(pInterp, pNative, pProp);
 
-    if (!ret && (
-        !p->pClass || Tcl_FindHashEntry(&p->pClass->aProperty, (char *)pProp)
-    )) {
+    if (!ret) {
         Tcl_Interp *pTcl = pTclSeeInterp->pTclInterp;
-        rc = callSeeTclMethod(pTcl, 0, p, "HasProperty", pProp, 0);
+        rc = callSeeTclMethod(pTcl, 0, pObject, "HasProperty", pProp, 0);
         throwTclError(pInterp, rc);
         rc = Tcl_GetBooleanFromObj(pTcl, Tcl_GetObjResult(pTcl), &ret);
         throwTclError(pInterp, rc);
@@ -2411,7 +2211,7 @@ SeeTcl_Construct(pInterp, pObj, pThis, argc, argv, pRes)
     struct SEE_object *pThis;
     int argc;
     struct SEE_value **argv;
-    struct SEE_value *pRes;
+    struct SEE_string *pRes;
 {
     tclCallOrConstruct("Construct", pInterp, pObj, pThis, argc, argv, pRes);
 }
@@ -2422,7 +2222,7 @@ SeeTcl_Call(pInterp, pObj, pThis, argc, argv, pRes)
     struct SEE_object *pThis;
     int argc;
     struct SEE_value **argv;
-    struct SEE_value *pRes;
+    struct SEE_string *pRes;
 {
     tclCallOrConstruct("Call", pInterp, pObj, pThis, argc, argv, pRes);
 }
@@ -2546,12 +2346,12 @@ tclEnumerator(pInterp, pObj)
     return (struct SEE_enum *)pEnum;
 }
 
-static int 
-tclSeeAlloc(clientData, interp, objc, objv)
-    ClientData clientData;             /* Unused */
-    Tcl_Interp *interp;                /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+static int
+tclSeeAlloc(
+    ClientData clientData,             /* Unused */
+    Tcl_Interp *interp,                /* Current interpreter. */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     Tcl_Obj *pRet = Tcl_NewObj();
     int ii;
@@ -2583,12 +2383,12 @@ tclSeeAlloc(clientData, interp, objc, objv)
     return TCL_OK;
 }
 
-static int 
-tclSeeCollect(clientData, interp, objc, objv)
-    ClientData clientData;             /* Unused */
-    Tcl_Interp *interp;                /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+static int
+tclSeeCollect(
+    ClientData clientData,             /* Unused */
+    Tcl_Interp *interp,                /* Current interpreter. */
+    int objc,                          /* Number of arguments. */
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
 #ifndef NO_HAVE_GC
     GC_gcollect();
@@ -2596,97 +2396,15 @@ tclSeeCollect(clientData, interp, objc, objv)
     return TCL_OK;
 }
 
-static int
-classCall(clientData, interp, objc, objv)
-    ClientData clientData;             /* Pointer to class object */
-    Tcl_Interp *interp;                /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
-{
-    return TCL_OK;
-}
-static void
-classDelete(clientData)
-    ClientData clientData;             /* Pointer to class object */
-{
-    SeeTclClass *p = (SeeTclClass *)clientData;
-    Tcl_DeleteHashTable(&p->aProperty);
-    ckfree((char *)p);
-}
-
-/*
- *---------------------------------------------------------------------------
- *
- * tclSeeClass --
- *
- *   Implementation of [::see::class].
- *
- *     ::see::class CLASS-NAME PROPERTY-LIST
- *
- * Results:
- *   TCL_OK or TCL_ERROR.
- *
- * Side effects:
- *   See above.
- *
- *---------------------------------------------------------------------------
- */
-static int 
-tclSeeClass(clientData, interp, objc, objv)
-    ClientData clientData;             /* Unused */
-    Tcl_Interp *interp;                /* Current interpreter. */
-    int objc;                          /* Number of arguments. */
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
-{
-    SeeTclClass *p;
-    Tcl_Obj **apObj;
-    Tcl_Size nObj;
-
-    int ii;
-    char zBuf[256];
-
-    if (objc != 3) {
-        Tcl_WrongNumArgs(interp, 1, objv, "CLASS-NAME PROPERTY-LIST");
-        return TCL_ERROR;
-    }
-
-    if (iSeeInterp > 0) {
-        Tcl_AppendResult(
-            interp, "::see::class cannot be called after ::see::interp", 0);
-        return TCL_ERROR;
-    }
-
-    p = (SeeTclClass *)ckalloc(sizeof(SeeTclClass));
-    memset(p, 0, sizeof(SeeTclClass));
-    Tcl_InitHashTable(&p->aProperty, TCL_ONE_WORD_KEYS);
-
-    if (Tcl_ListObjGetElements(interp, objv[2], &nObj, &apObj)) {
-        return TCL_ERROR;
-    }
-    for (ii = 0; ii < nObj; ii++) {
-        int isNew;
-        struct SEE_string *str = SEE_intern_global(Tcl_GetString(apObj[ii]));
-        Tcl_CreateHashEntry(&p->aProperty, (char *)str, &isNew);
-    }
-    sprintf(zBuf, "%s.class", Tcl_GetString(objv[1]));
-
-    Tcl_CreateObjCommand(interp, zBuf, classCall, (char *)p, classDelete);
-    return TCL_OK;
-}
-
 int 
 Tclsee_Init(interp)
     Tcl_Interp *interp;
 {
-    /* Require stubs libraries version 8.4 or greater. */
+    /* Require stubs libraries version 9.0 or greater. */
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.4", 0) == 0) {
+    if (Tcl_InitStubs(interp, "9.0", 0) == 0) {
         return TCL_ERROR;
     }
-#endif
-
-#ifndef NO_HAVE_GC
-    GC_init();
 #endif
 
     Tcl_PkgProvide(interp, "Tclsee", "0.1");
@@ -2694,7 +2412,6 @@ Tclsee_Init(interp)
     Tcl_CreateObjCommand(interp, "::see::alloc",  tclSeeAlloc, 0, 0);
     Tcl_CreateObjCommand(interp, "::see::format", tclSeeFormat, 0, 0);
     Tcl_CreateObjCommand(interp, "::see::gc",     tclSeeCollect, 0, 0);
-    Tcl_CreateObjCommand(interp, "::see::class",  tclSeeClass, 0, 0);
     return TCL_OK;
 }
 
