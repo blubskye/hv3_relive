@@ -147,12 +147,12 @@ typedef struct SubCmd SubCmd;
  *
  *---------------------------------------------------------------------------
  */
-void 
+void
 logCommon(
-    HtmlTree *pTree, 
-    Tcl_Obj *pLogCmd, 
-    CONST char *zSubject, 
-    CONST char *zFormat, 
+    HtmlTree *pTree,
+    Tcl_Obj *pLogCmd,
+    CONST char *zSubject,
+    CONST char *zFormat,
     va_list ap
 )
 {
@@ -162,13 +162,16 @@ logCommon(
         char *zBuf = zStack;
         Tcl_Size nBuf;
         Tcl_Obj *pCmd;
+        va_list ap_copy;
 
+        va_copy(ap_copy, ap);
         nBuf = vsnprintf(zBuf, 200, zFormat, ap);
         if (nBuf >= 200) {
             zDyn = HtmlAlloc(0, nBuf + 10);
             zBuf = zDyn;
-            nBuf = vsnprintf(zBuf, nBuf + 1, zFormat, ap);
+            nBuf = vsnprintf(zBuf, nBuf + 1, zFormat, ap_copy);
         }
+        va_end(ap_copy);
 
         pCmd = Tcl_DuplicateObj(pLogCmd);
         Tcl_IncrRefCount(pCmd);

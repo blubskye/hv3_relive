@@ -966,11 +966,13 @@ tableDrawCells(pNode, col, colspan, row, rowspan, pContext)
         HtmlTree *pTree = pLayout->pTree;
         Tcl_Obj *pCmd = HtmlNodeCommand(pTree, pNode);
         if (pCmd) {
-            HtmlLog(pTree, "LAYOUTENGINE", "%s tableDrawCells() "
-                "containing=%d actual=%d",
-                Tcl_GetString(pCmd),
-                pBox->iContaining, pBox->width
-            );
+            const char *zCmd = Tcl_GetString(pCmd);
+            if (zCmd) {
+                HtmlLog(pTree, "LAYOUTENGINE", "%s tableDrawCells() "
+                    "containing=%d actual=%d",
+                    zCmd, pBox->iContaining, pBox->width
+                );
+            }
         }
     }
 
@@ -1405,22 +1407,28 @@ tableCalculateCellWidths(pData, availablewidth, isAuto)
         HtmlTree *pTree = pLayout->pTree;
         Tcl_Obj *pCmd = HtmlNodeCommand(pTree, pData->pNode);
         if (pCmd) {
+            const char *zCmd = Tcl_GetString(pCmd);
             Tcl_Obj *pLog = Tcl_NewObj();
+            const char *zLog;
             Tcl_IncrRefCount(pLog);
-    
+
             Tcl_AppendToObj(pLog, "Inputs to column width algorithm: ", -1);
             Tcl_AppendToObj(pLog, "<p>Available width is ", -1);
             Tcl_AppendObjToObj(pLog, Tcl_NewIntObj(availablewidth));
             Tcl_AppendToObj(pLog, "  (width property was <b>", -1);
             Tcl_AppendToObj(pLog, isAuto ? "auto</b>" : "not</b> auto", -1);
             Tcl_AppendToObj(pLog, ")</p>", -1);
-    
+
             logWidthsToTable(pData, pLog);
-    
-            HtmlLog(pTree, "LAYOUTENGINE", "%s tableCalculateCellWidths() %s",
-                Tcl_GetString(pCmd), Tcl_GetString(pLog)
-            );
-    
+            zLog = Tcl_GetString(pLog);
+
+            /* Safety check - skip logging if strings are NULL */
+            if (zCmd && zLog) {
+                HtmlLog(pTree, "LAYOUTENGINE", "%s tableCalculateCellWidths() %s",
+                    zCmd, zLog
+                );
+            }
+
             Tcl_DecrRefCount(pLog);
             pStageLog = Tcl_NewObj();
             Tcl_IncrRefCount(pStageLog);
@@ -1587,11 +1595,13 @@ tableCalculateCellWidths(pData, availablewidth, isAuto)
         HtmlTree *pTree = pLayout->pTree;
         Tcl_Obj *pCmd = HtmlNodeCommand(pTree, pData->pNode);
         if (pCmd) {
+            const char *zCmd = Tcl_GetString(pCmd);
             Tcl_Obj *pLog = Tcl_NewObj();
+            const char *zLog;
             Tcl_IncrRefCount(pLog);
-    
+
             Tcl_AppendToObj(pLog, "<p>Summary of algorithm:</p>", -1);
-            Tcl_AppendToObj(pLog, 
+            Tcl_AppendToObj(pLog,
                 "<ol>"
                 "  <li>Minimum content width allocation."
                 "  <li>Percent width allocation."
@@ -1605,7 +1615,7 @@ tableCalculateCellWidths(pData, availablewidth, isAuto)
                 "  <li>Reduce percent width cols. (optional)"
                 "</ol>", -1
             );
-    
+
             Tcl_AppendToObj(pLog, "<p>Results of column width algorithm:</p>", -1);
             Tcl_AppendToObj(pLog, "<table><tr><th></th>", -1);
             for (ii = 0; ii < pData->nCol; ii++) {
@@ -1615,11 +1625,15 @@ tableCalculateCellWidths(pData, availablewidth, isAuto)
             Tcl_AppendToObj(pLog, "</tr>", -1);
             Tcl_AppendObjToObj(pLog, pStageLog);
             Tcl_AppendToObj(pLog, "</table>", -1);
-    
-            HtmlLog(pTree, "LAYOUTENGINE", "%s tableCalculateCellWidths() %s",
-                Tcl_GetString(pCmd), Tcl_GetString(pLog)
-            );
-    
+            zLog = Tcl_GetString(pLog);
+
+            /* Safety check - skip logging if strings are NULL */
+            if (zCmd && zLog) {
+                HtmlLog(pTree, "LAYOUTENGINE", "%s tableCalculateCellWidths() %s",
+                    zCmd, zLog
+                );
+            }
+
             Tcl_DecrRefCount(pLog);
         }
     }
@@ -1795,11 +1809,13 @@ HtmlTableLayout(pLayout, pBox, pNode)
     LOG {
         Tcl_Obj *pCmd = HtmlNodeCommand(pTree, pNode);
         if (pCmd) {
-            HtmlTree *pTree = pLayout->pTree;
-            HtmlLog(pTree, "LAYOUTENGINE", "%s HtmlTableLayout() "
-                "Dimensions are %dx%d", Tcl_GetString(pCmd), 
-                data.nCol, data.nRow
-            );
+            const char *zCmd = Tcl_GetString(pCmd);
+            HtmlTree *pTree2 = pLayout->pTree;
+            if (zCmd) {
+                HtmlLog(pTree2, "LAYOUTENGINE", "%s HtmlTableLayout() "
+                    "Dimensions are %dx%d", zCmd, data.nCol, data.nRow
+                );
+            }
         }
     }
 
@@ -1890,11 +1906,13 @@ HtmlTableLayout(pLayout, pBox, pNode)
 LOG {
     Tcl_Obj *pCmd = HtmlNodeCommand(pTree, pNode);
     if (pCmd) {
-        HtmlTree *pTree = pLayout->pTree;
-        HtmlLog(pTree, "LAYOUTENGINE", "%s HtmlTableLayout() "
-            "Content size is %dx%d", Tcl_GetString(pCmd), 
-                pBox->width, pBox->height
+        const char *zCmd = Tcl_GetString(pCmd);
+        HtmlTree *pTree2 = pLayout->pTree;
+        if (zCmd) {
+            HtmlLog(pTree2, "LAYOUTENGINE", "%s HtmlTableLayout() "
+                "Content size is %dx%d", zCmd, pBox->width, pBox->height
             );
+        }
     }
 }
     return TCL_OK;
