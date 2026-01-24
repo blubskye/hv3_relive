@@ -2901,17 +2901,18 @@ HtmlNodeCommand(pTree, pNode)
 {
     static Tcl_Size nodeNumber = 0;
     static Tcl_Obj *pGeneratedNode = NULL;
-    HtmlNodeCmd *pNodeCmd = pNode->pNodeCmd;
+    HtmlNodeCmd *pNodeCmd;
 
-    if (pNode->iNode == HTML_NODE_GENERATED) {
-        /* Return a placeholder string for generated nodes instead of NULL
-         * to avoid crashes when callers pass result to Tcl_GetString() */
+    /* Return placeholder for NULL or generated nodes to avoid crashes */
+    if (!pNode || pNode->iNode == HTML_NODE_GENERATED) {
         if (!pGeneratedNode) {
             pGeneratedNode = Tcl_NewStringObj("(generated)", -1);
             Tcl_IncrRefCount(pGeneratedNode);
         }
         return pGeneratedNode;
     }
+
+    pNodeCmd = pNode->pNodeCmd;
 
     if (!pNodeCmd) {
         char zBuf[100];
