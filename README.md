@@ -176,38 +176,73 @@ make
 
 ## 🚀 Running HV3
 
+### ⚡ Quick Start (Pre-built Starkit)
+
+The easiest way to run HV3 is using the pre-built starkit with a Tcl 9 tclkit:
+
+```bash
+# Download tclkit 9.0 for your platform (Linux 64-bit example)
+# Get it from: https://tclkits.rkeene.org/fossil/wiki/Downloads
+
+# Run HV3 directly
+./tclkit9 hv3.kit
+
+# Or with the included tclkit (if available)
+./tclkit-9.0.3-Linux64-intel-tk hv3.kit
+```
+
+The `hv3.kit` starkit contains everything needed - Tkhtml3 library, Tcl scripts, and polipo proxy.
+
+### 🔨 Rebuilding the Starkit
+
+If you modify source files and need to rebuild:
+
+```bash
+# 1. Rebuild the Tkhtml3 library
+cd build-tkhtml
+make clean && make
+
+# 2. Copy library to starkit VFS
+cp libTkhtml3.0.so ../hv3.vfs/lib/tkhtml3.0/
+
+# 3. Rebuild the starkit (requires sdx and tclkit)
+cd ..
+./tclkit9 sdx-20110317.kit wrap hv3.kit -vfs hv3.vfs
+
+# 4. Run the updated browser
+./tclkit9 hv3.kit
+```
+
 ### 📍 Binary Locations
 
 After building, you'll find the compiled components at:
 
 | Component | Location | Type |
 |-----------|----------|------|
+| **HV3 Starkit** | `hv3.kit` | Starkit (all-in-one) |
 | **Polipo** | `polipo/polipo` | Binary (727KB) |
 | **Tkhtml3** | `build-tkhtml/libTkhtml3.0.so` | Shared Library (400KB) |
 | **Tkhtml3 Package** | `build-tkhtml/pkgIndex.tcl` | Tcl Package Index |
 | **Tclsee** | `tclsee/tclsee0.1/libTclsee.so` | Shared Library (718KB) |
 | **Tclsee Package** | `tclsee/tclsee0.1/pkgIndex.tcl` | Tcl Package Index |
 
-### ▶️ Launching the Browser
+### ▶️ Alternative: Run from VFS Directory
 
-Use the provided launcher script:
+If you don't have a tclkit, you can run from the VFS directly:
 
 ```bash
-./run-hv3.sh
+cd hv3.vfs
+tclsh9.0 main.tcl
 ```
 
-The launcher script automatically:
-- Sets up package paths for Tkhtml3 and Tclsee
-- Launches the HV3 browser with proper environment
+### 🎯 Development Mode
 
-### 🎯 Manual Launch
-
-If you prefer to run manually:
+For development with the source tree:
 
 ```bash
 cd htmlwidget/hv
 export TCLLIBPATH="../../build-tkhtml ../../tclsee"
-tclsh hv3_main.tcl
+tclsh9.0 hv3_main.tcl
 ```
 
 ### 📋 Runtime Requirements
@@ -312,7 +347,7 @@ See individual LICENSE files in each component directory for full license text.
 | Contributor | Role |
 |-------------|------|
 | **blubskye** | Project lead, source hunting, Tcl 9.0 porting |
-| **Claude Sonnet 4.5** | AI assistant for code analysis and fixes |
+| **Claude Opus 4.5** | AI assistant for code analysis and fixes |
 
 ### 🌟 Original Authors
 
@@ -336,10 +371,16 @@ See individual LICENSE files in each component directory for full license text.
 
 ## ⚠️ Known Issues
 
-- 🔨 Full browser runtime not yet tested
 - 🌐 No HTTPS/TLS support yet (OpenSSL integration planned)
 - 🎨 Modern CSS/HTML5 features not supported
 - ⚡ JavaScript support limited to ECMAScript 3 (SEE limitation)
+
+## ✅ Recent Fixes
+
+- **va_list crash fix** - Fixed crash in logging when log messages exceed 200 chars (va_copy added)
+- **Polipo non-blocking startup** - Polipo proxy now starts asynchronously without blocking GUI
+- **NULL pointer safety** - Added defensive NULL checks in HtmlLog calls and HtmlNodeCommand
+- **Debug tree browser** - "Re-render Document With Logging" now works without crashing
 
 ---
 

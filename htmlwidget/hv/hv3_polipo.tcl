@@ -192,12 +192,14 @@ namespace eval ::hv3::polipo {
     if {[eof $g(filehandle)]} {
       set s "ERROR: Polipo failed."
       stop
-      popup
+      # Delay popup until after main window is built - use after idle
+      after idle [namespace code popup]
     } else {
       set s [gets $g(filehandle)]
       if {$g(keepalive) eq "" && [scan $s "polipo port is %d" g(port)] == 1} {
-        set g(keepalive) ""
         set g(keepalive) [socket localhost $g(port)]
+        # Configure proxy now that polipo is ready
+        configure_proxy
       }
     }
     if {$s ne ""} { print "$s\n" }
@@ -213,8 +215,8 @@ namespace eval ::hv3::polipo {
     set g(keepalive) ""
   }
 
-  # (Re)start the polipo process. This proc blocks until polipo has
-  # been successfully (re)started.
+  # (Re)start the polipo process. Non-blocking version that doesn't
+  # use vwait to avoid blocking the GUI startup.
   proc restart {} {
     variable g
 
@@ -226,36 +228,40 @@ namespace eval ::hv3::polipo {
       return
     }
 
-    # Kick off polipo.
+    # Kick off polipo with proper cache directories
+    set homedir $::env(HOME)
     set cmd "|{$g(binary)} dontCacheRedirects=true dontCacheCookies=true"
     append cmd " allowedPorts=1-65535"
+    append cmd " diskCacheRoot=$homedir/polipo_cache/"
+    append cmd " localDocumentRoot=$homedir/polipo_www/"
+    append cmd " proxyAddress=127.0.0.1"
     if {$::tcl_platform(platform) eq "unix"} {
       append cmd " |& cat"
-      # set cmd "|{$g(binary)} diskCacheRoot=/home/dan/cache |& cat"
     }
     set fd [open $cmd r]
     fconfigure $fd -blocking 0
     fconfigure $fd -buffering none
     fileevent $fd readable [namespace code polipo_stdout]
 
-    # Wait until the keepalive connection is established.
     set g(filehandle) $fd
-    if {$g(keepalive) eq ""} {
-      vwait ::hv3::polipo::g(keepalive)
-    }
+    # Don't block with vwait - let polipo start asynchronously
+    # The proxy will be configured when polipo reports its port
+  }
 
-    # Log a fun and friendly message.
+  # Called when polipo reports its port - configure the proxy
+  proc configure_proxy {} {
+    variable g
     if {$g(keepalive) ne ""} {
       print "INFO:  Polipo (re)started successfully.\n"
       catch {
         ::http::config -proxyhost 127.0.0.1
         ::http::config -proxyport $g(port)
       }
-    } 
+    }
   }
 }
 
 ::hv3::polipo::init
-::hv3::polipo::restart
-#::hv3::polipo::popup
+# Delay polipo startup until after GUI is built to avoid blocking
+after idle {::hv3::polipo::restart}
 
