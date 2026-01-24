@@ -18,11 +18,6 @@
  *     };
  */
 
-/* Compatibility for Tcl 9.0+ where CONST was removed */
-#ifndef CONST
-#define CONST const
-#endif
-
 /*
  * By defining STOP_PROPAGATION as "cancelBubble", we can also
  * support the mozilla extension Event.cancelBubble. Setting it to true
@@ -161,32 +156,6 @@ getEventList(interp, pObj)
     return 0;
 }
 
-static void
-objectCall(pInterp, pObj, pThis, argc, argv, pRes)
-    struct SEE_interpreter *pInterp;
-    struct SEE_object *pObj;
-    struct SEE_object *pThis;
-    int argc;
-    struct SEE_value **argv;
-    struct SEE_value *pRes;
-{
-#if 1
-    SEE_OBJECT_CALL(pInterp, pObj, pThis, argc, argv, pRes);
-#else
-    SEE_try_context_t try_ctxt;
-    SEE_TRY(pInterp, try_ctxt) {
-        SEE_OBJECT_CALL(pInterp, pObj, pThis, argc, argv, pRes);
-    }
-    if (SEE_CAUGHT(try_ctxt)) {
-        struct SEE_value str;
-        SEE_ToString(pInterp, SEE_CAUGHT(try_ctxt), &str);
-        printf("Error in event-handler: ");
-        SEE_PrintValue(pInterp, &str, stdout);
-        printf("\n");
-    } 
-#endif
-}
-
 /*
  *---------------------------------------------------------------------------
  *
@@ -214,11 +183,6 @@ runEvent(interp, pTarget, pEvent, zType, isCapture)
     ListenerContainer *pL = 0;
     struct SEE_value target;
 
-    /* If *pTarget is a tcl-based object, then set this pointer to pTarget. 
-     * Otherwise leave it as null.
-     */
-    SeeTclObject *pTclObject = 0;
-
     assert(zType->flags & SEE_STRING_FLAG_INTERNED);
     assert(isCapture == 1 || isCapture == 0);
     assert(SEE_VALUE_GET_TYPE(pEvent) == SEE_OBJECT);
@@ -231,18 +195,14 @@ runEvent(interp, pTarget, pEvent, zType, isCapture)
         return 0;
     }
 
-    if (pTarget->objectclass == getVtbl()) {
-        pTclObject = (SeeTclObject *)pTarget;
-    }
-
     /* If this is a Tcl based object, run any registered DOM event handlers */
-    if (pTclObject) {
-        ppET = &pTclObject->pTypeList;
+    ppET = getEventList(interp, pTarget);
+    if (ppET) {
         for (pET = *ppET; pET && pET->zType != zType; pET = pET->pNext);
         for (pL = (pET ? pET->pListenerList: 0); rc && pL; pL = pL->pNext) {
             if (pL->isCapture == isCapture) {
                 struct SEE_value r;
-                objectCall(interp, pL->pListener, pTarget, 1, &pEvent, &r);
+                SEE_OBJECT_CALL(interp, pL->pListener, pTarget, 1, &pEvent, &r);
                 setBooleanFlag(interp, pEvent->u.object, CALLED_LISTENER, 1);
             }
         }
@@ -252,19 +212,16 @@ runEvent(interp, pTarget, pEvent, zType, isCapture)
     if (!isCapture) {
         struct SEE_value val;
         struct SEE_string *e = SEE_string_new(interp, 128);
-        struct SEE_object *pLookup = (pTclObject ?
-            ((struct SEE_object *)pTclObject->pNative) : pTarget
-        );
-
         SEE_string_append_ascii(e, "on");
         SEE_string_append(e, zType);
+
         e = SEE_intern(interp, e);
 
-        SEE_OBJECT_GET(interp, pLookup, e, &val);
+        SEE_OBJECT_GET(interp, pTarget, e, &val);
         if (SEE_VALUE_GET_TYPE(&val) == SEE_OBJECT) {
             struct SEE_object *pE = pEvent->u.object;
             struct SEE_value res;
-            objectCall(interp, val.u.object, pTarget, 1, &pEvent, &res);
+            SEE_OBJECT_CALL(interp, val.u.object, pTarget, 1, &pEvent, &res);
             setBooleanFlag(interp, pE, CALLED_LISTENER, 1);
             rc = valueToBoolean(interp, &res, 1);
             if (!rc) {
@@ -321,31 +278,6 @@ stopPropagationFunc(interp, self, thisobj, argc, argv, res)
     struct SEE_value **argv, *res;
 {
     setBooleanFlag(interp, thisobj, STOP_PROPAGATION, 1);
-}
-
-static struct SEE_object *
-getParentNode(interp, p)
-    struct SEE_interpreter *interp;
-    struct SEE_object *p;
-{
-    struct SEE_value val;
-
-    if (p->objectclass == getVtbl()){
-        NodeHack *pNode = ((SeeTclObject *)p)->nodehandle;
-        if (pNode && pNode->pParent && pNode->pParent->pObj) {
-            return (struct SEE_object *)pNode->pParent->pObj;
-        }
-        if (pNode && pNode->pParent == 0 && pNode->iNode < 0){
-            return 0;
-        }
-        if (pNode && pNode->pParent == 0) {
-            /* Return document... */
-        }
-    }
-
-    SEE_OBJECT_GETA(interp, p, "parentNode", &val);
-    if (SEE_VALUE_GET_TYPE(&val) != SEE_OBJECT) return 0;
-    return val.u.object;
 }
 
 /*
@@ -411,7 +343,6 @@ dispatchEventFunc(interp, self, thisobj, argc, argv, res)
         return;
     }
     pEvent = argv[0]->u.object;
-    assert(pEvent);
 
     SEE_CFUNCTION_PUTA(interp,pEvent,"stopPropagation",stopPropagationFunc,0,0);
     SEE_CFUNCTION_PUTA(interp,pEvent,"preventDefault",preventDefaultFunc,0,0);
@@ -445,8 +376,9 @@ dispatchEventFunc(interp, self, thisobj, argc, argv, res)
     if (isBubbler) {
         struct SEE_object *p = thisobj;
         while (1) {
-            struct SEE_object *pObj = getParentNode(interp, p);
-            if (!pObj) break;
+            SEE_OBJECT_GETA(interp, p, "parentNode", &val);
+            if (SEE_VALUE_GET_TYPE(&val) != SEE_OBJECT) break;
+
             if (nObj == nObjAlloc) {
                 int nNew;
                 struct SEE_object **aNew;
@@ -459,8 +391,9 @@ dispatchEventFunc(interp, self, thisobj, argc, argv, res)
                 }
                 apObj = aNew;
             }
-            apObj[nObj++] = pObj;
-            p = pObj;
+
+            p = val.u.object;
+            apObj[nObj++] = p;
         }
     }
 
@@ -505,11 +438,11 @@ dispatchEventFunc(interp, self, thisobj, argc, argv, res)
  *---------------------------------------------------------------------------
  */
 static int
-eventDispatchCmd(clientData, pTcl, objc, objv)
-    ClientData clientData;
-    Tcl_Interp *pTcl;
-    int objc;
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+eventDispatchCmd(
+    ClientData clientData,
+    Tcl_Interp *pTcl,
+    int objc,
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     SeeInterp *pTclSeeInterp = (SeeInterp *)clientData;
     struct SEE_interpreter *p = &pTclSeeInterp->interp;
@@ -522,8 +455,7 @@ eventDispatchCmd(clientData, pTcl, objc, objv)
     int rc = TCL_OK;
 
     pTarget = findOrCreateObject(pTclSeeInterp, objv[2], 0);
-    // pEvent = createTransient(pTclSeeInterp, objv[3]);
-    pEvent = createNative(pTclSeeInterp, objv[3]);
+    pEvent = createTransient(pTclSeeInterp, objv[3]);
     assert(Tcl_IsShared(objv[3]));
 
     SEE_TRY (p, try_ctxt) {
@@ -940,11 +872,11 @@ listenerToString(pSeeInterp, pListener)
  *---------------------------------------------------------------------------
  */
 static int
-eventDumpCmd(clientData, pTcl, objc, objv)
-    ClientData clientData;
-    Tcl_Interp *pTcl;
-    int objc;
-    Tcl_Obj *CONST objv[];             /* Argument strings. */
+eventDumpCmd(
+    ClientData clientData,
+    Tcl_Interp *pTcl,
+    int objc,
+    Tcl_Obj *const objv[])             /* Argument strings. */
 {
     SeeTclObject *p;
     SeeInterp *pTclSeeInterp = (SeeInterp *)clientData;
@@ -965,11 +897,15 @@ eventDumpCmd(clientData, pTcl, objc, objv)
 
     for (pType = p->pTypeList; pType; pType = pType->pNext) {
         ListenerContainer *pL;
-        Tcl_UniChar *tcl_str;
+        Tcl_Obj *pEventType;
 
-        tcl_str = SEE_to_TclUnicode(pType->zType->data, pType->zType->length);
-        Tcl_Obj *pEventType = Tcl_NewUnicodeObj(tcl_str, pType->zType->length);
-        ckfree((char *)tcl_str);
+        /* Convert SEE_string to UTF-8 for Tcl 9 compatibility */
+        {
+            int nType = SEE_string_utf8_size(pInterp, pType->zType);
+            char *zType = SEE_malloc_string(pInterp, nType+1);
+            SEE_string_toutf8(pInterp, zType, nType+1, pType->zType);
+            pEventType = Tcl_NewStringObj(zType, -1);
+        }
         Tcl_IncrRefCount(pEventType);
         apRow[0] = pEventType;
 

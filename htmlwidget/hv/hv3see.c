@@ -2369,9 +2369,9 @@ int
 Tclsee_Init(interp)
     Tcl_Interp *interp;
 {
-    /* Require stubs libraries version 8.4 or greater. */
+    /* Require stubs libraries version 9.0 or greater. */
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.4", 0) == 0) {
+    if (Tcl_InitStubs(interp, "9.0", 0) == 0) {
         return TCL_ERROR;
     }
 #endif

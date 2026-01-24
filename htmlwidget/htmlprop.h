@@ -34,10 +34,10 @@ typedef struct HtmlFontCache HtmlFontCache;
  * position properties too ('top', 'right', 'bottom' and 'left').
  */
 struct HtmlFourSides {
-    Tcl_Size iTop;
-    Tcl_Size iLeft;
-    Tcl_Size iBottom;
-    Tcl_Size iRight;
+    int iTop;
+    int iLeft;
+    int iBottom;
+    int iRight;
 };
 
 /*
@@ -61,7 +61,7 @@ struct HtmlFontKey {
     unsigned char isBold;    /* True if the font is bold */
 };
 struct HtmlFont {
-    Tcl_Size nRef;              /* Number of pointers to this structure */
+    int nRef;              /* Number of pointers to this structure */
     HtmlFontKey *pKey;     /* Pointer to corresponding HtmlFontKey structure */
     char *zFont;           /* Name of font */
     Tk_Font tkfont;        /* The Tk font */
@@ -92,7 +92,7 @@ struct HtmlFontCache {
  * table. The hash table uses string keys (the name of the color).
  */
 struct HtmlColor {
-    Tcl_Size nRef;              /* Number of pointers to this structure */
+    int nRef;              /* Number of pointers to this structure */
     char *zColor;          /* Name of color */
     XColor *xcolor;        /* The XColor* */
 };
@@ -199,7 +199,7 @@ struct HtmlColor {
  */
 struct HtmlComputedValues {
     HtmlImage2 *imZoomedBackgroundImage;   /* MUST BE FIRST (see htmlhash.c) */
-    Tcl_Size nRef;                              /* MUST BE FIRST (see htmlhash.c) */
+    int nRef;                              /* MUST BE FIRST (see htmlhash.c) */
 
     unsigned int mask;
 
@@ -221,10 +221,10 @@ struct HtmlComputedValues {
     unsigned char eVerticalAlign;     /* 'vertical-align' */
     int iVerticalAlign;               /* 'vertical-align' (pixels) */
 
-    Tcl_Size iWidth;                       /* 'width'          (pixels, %, AUTO)   */
+    int iWidth;                       /* 'width'          (pixels, %, AUTO)   */
     int iMinWidth;                    /* 'min-width'      (pixels, %)         */
     int iMaxWidth;                    /* 'max-height'     (pixels, %, NONE)   */
-    Tcl_Size iHeight;                      /* 'height'         (pixels, % AUTO)    */
+    int iHeight;                      /* 'height'         (pixels, % AUTO)    */
     int iMinHeight;                   /* 'min-height'     (pixels, %)         */
     int iMaxHeight;                   /* 'max-height'     (pixels, %, NONE)   */
     HtmlFourSides padding;            /* 'padding'        (pixels, %)         */

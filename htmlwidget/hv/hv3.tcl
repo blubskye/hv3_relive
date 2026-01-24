@@ -1250,6 +1250,14 @@ snit::widget ::hv3::hv3 {
         set img [string range $uri 8 end]
         return $img
     }
+
+    # Skip CSS gradient functions - these are not image URLs
+    # Tkhtml3 doesn't support CSS gradients, so just return an empty image
+    if {[regexp {^(linear|radial|conic|repeating-linear|repeating-radial)-gradient\(} $uri]} {
+        set name [image create photo]
+        return [list $name [list image delete $name]]
+    }
+
     set name [image create photo]
 
     if {$uri ne ""} {
